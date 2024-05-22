@@ -92,9 +92,6 @@ def create_knowledge_graph(data, columns):
         genres = entry[columns.get_loc('Genre')].split(', ')
         genre_frequency.update(genres)
 
-    # Debug: write genre frequency
-    st.write("Initial genre frequency calculated.")
-
     # Scale the size of nodes based on the number of artists in each genre
     max_frequency = max(genre_frequency.values())
     scaling_factor = 30  # Adjust the scaling factor as needed
@@ -148,7 +145,7 @@ try:
     with open(html_path, 'r', encoding='utf-8') as HtmlFile:
         html_content = HtmlFile.read()
 
-    components.html(html_content, height=1000, width=1000)
+    components.html(html_content, height=800, width=1000)
 
 except FileNotFoundError:
     st.warning(f"HTML file not found at {html_path}.")
