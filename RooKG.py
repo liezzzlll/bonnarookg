@@ -83,6 +83,9 @@ shape_map = {
 }
 
 def create_knowledge_graph(data, columns):
+    # Initialize the network
+    net = Network(notebook=True)
+    
     # Calculate the frequency of each genre
     genre_frequency = Counter()
     for entry in data:
@@ -90,7 +93,7 @@ def create_knowledge_graph(data, columns):
         genre_frequency.update(genres)
 
     # Debug: write genre frequency
-    st.write(f"Genre: {genre}, Frequency: {frequency}, Node Size: {node_size}")
+    st.write("Initial genre frequency calculated.")
 
     # Scale the size of nodes based on the number of artists in each genre
     max_frequency = max(genre_frequency.values())
