@@ -89,8 +89,8 @@ def create_knowledge_graph(data, columns):
         genres = entry[columns.get_loc('Genre')].split(', ')
         genre_frequency.update(genres)
 
-    # Debug: Print genre frequency
-    print("Genre Frequency:", genre_frequency)
+    # Debug: write genre frequency
+    st.write(f"Genre: {genre}, Frequency: {frequency}, Node Size: {node_size}")
 
     # Scale the size of nodes based on the number of artists in each genre
     max_frequency = max(genre_frequency.values())
@@ -98,8 +98,8 @@ def create_knowledge_graph(data, columns):
     min_size = 30        # Minimum size for genre nodes
     artist_size = 15     # Fixed size for artist nodes
 
-    # Debug: Print max frequency
-    print("Max Frequency:", max_frequency)
+    # Debug: write max frequency
+    st.write("Max Frequency:", max_frequency)
 
     # Add nodes and edges to the network
     for entry in data:
@@ -110,8 +110,8 @@ def create_knowledge_graph(data, columns):
         for genre in genres:
             frequency = genre_frequency[genre]
             node_size = min_size + scaling_factor * (frequency / max_frequency)  # Ensure minimum size
-            # Debug: Print node size for each genre
-            print(f"Genre: {genre}, Frequency: {frequency}, Node Size: {node_size}")
+            # Debug: write node size for each genre
+            st.write(f"Genre: {genre}, Frequency: {frequency}, Node Size: {node_size}")
             net.add_node(genre, label=genre, title=genre, color=color_map['Genre'], size=node_size, shape=shape_map['Genre'])
             net.add_edge(genre, artist)
 
