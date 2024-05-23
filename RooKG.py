@@ -10,8 +10,8 @@ from IPython.core.display import display, HTML
 # Read the new CSV file
 descriptors_data = pd.read_csv("Bonnaroo_KG.csv")
 
-# Convert DataFrame to a list of lists with all entries as strings
-project_data = descriptors_data.astype(str).values.tolist()
+# Split genres into separate rows
+descriptors_data = descriptors_data.assign(Genre=descriptors_data['Genre'].str.split(',')).explode('Genre').reset_index(drop=True)
 
 # Define a color mapping for each column header
 color_map = {
@@ -23,7 +23,7 @@ color_map = {
 }
 
 # Create a Network graph object
-net = Network(notebook=True, width="1200px", height="720px", cdn_resources='remote', font_color='white', bgcolor="#222222", select_menu=True, filter_menu=False)
+net = Network(notebook=True, width="1200px", height="720px", cdn_resources='remote', font_color='white', bgcolor="#222222", select_menu=True, filter_menu=True)
 
 st.title('Bonnaroo 2024 Music Festival Knowledge Graph')
 
@@ -67,7 +67,6 @@ shape_map = {
 }
 
 def create_knowledge_graph(data, columns): 
-    
     # Calculate the frequency of each genre
     genre_frequency = Counter()
     for entry in data:
@@ -82,19 +81,20 @@ def create_knowledge_graph(data, columns):
 
     # Add nodes and edges to the network
     for entry in data:
-        artist = entry[columns.get_loc('Artist')]
+        artist = str(entry[columns.get_loc('Artist')])  # Ensure ID is a string
         net.add_node(artist, label=artist, title=artist, color=color_map['Artist'], size=artist_size, shape=shape_map['Artist'], font={'size': 20, 'vadjust': 25})
 
         genres = entry[columns.get_loc('Genre')].split(', ')
         for genre in genres:
             frequency = genre_frequency[genre]
             node_size = min_size + scaling_factor * (frequency / max_frequency)  # Ensure minimum size
+            genre = str(genre)  # Ensure ID is a string
             net.add_node(genre, label=genre, title=genre, color=color_map['Genre'], size=node_size, shape=shape_map['Genre'])
             net.add_edge(genre, artist)
 
-        set_days = [entry[columns.get_loc('Set Day')], entry[columns.get_loc('2nd Set Day')], entry[columns.get_loc('3rd Set Day')]]
-        roo_locations = [entry[columns.get_loc('Roo Location')], entry[columns.get_loc('2nd Set Roo Location')], entry[columns.get_loc('3rd Set Roo Location')]]
-        stage_names = [entry[columns.get_loc('Stage Name')], entry[columns.get_loc('2nd Set Stage Name')], entry[columns.get_loc('3rd Set Stage Name')]]
+        set_days = [str(entry[columns.get_loc('Set Day')]), str(entry[columns.get_loc('2nd Set Day')]), str(entry[columns.get_loc('3rd Set Day')])]  # Ensure IDs are strings
+        roo_locations = [str(entry[columns.get_loc('Roo Location')]), str(entry[columns.get_loc('2nd Set Roo Location')]), str(entry[columns.get_loc('3rd Set Roo Location')])]  # Ensure IDs are strings
+        stage_names = [str(entry[columns.get_loc('Stage Name')]), str(entry[columns.get_loc('2nd Set Stage Name')]), str(entry[columns.get_loc('3rd Set Stage Name')])]  # Ensure IDs are strings
 
         for set_day, roo_location, stage_name in zip(set_days, roo_locations, stage_names):
             if set_day and set_day != "nan":
@@ -106,6 +106,45 @@ def create_knowledge_graph(data, columns):
             if stage_name and stage_name != "nan":
                 net.add_node(stage_name, label=stage_name, title=stage_name, color=color_map['Stage Name'], shape=shape_map['Stage Name'], font={'size': 20, 'vadjust': 25})
                 net.add_edge(artist, stage_name)
+                for genre in genres:
+                    net.add_edge(stage_name, genre)  # Add new relationship: Genre to Stage Name
+
+    # Configure physics and interaction options
+    net.set_options("""
+    {
+      "nodes": {
+        "borderWidth": 2,
+        "size": 30,
+        "color": {
+          "border": "#222222",
+          "background": "#666666"
+        },
+        "font": { "color": "#eeeeee" }
+      },
+      "edges": {
+        "color": "lightgray"
+      },
+      "physics": {
+        "enabled": true,
+        "stabilization": {
+          "enabled": true,
+          "iterations": 1000,
+          "updateInterval": 25
+        },
+        "barnesHut": {
+          "gravitationalConstant": -20000,
+          "centralGravity": 0.3,
+          "springLength": 95,
+          "springConstant": 0.04,
+          "damping": 0.09
+        }
+      },
+      "interaction": {
+        "navigationButtons": true,
+        "keyboard": true
+      }
+    }
+    """)
 
     # Generate the HTML content as a string
     html_content = net.generate_html()
@@ -114,7 +153,7 @@ def create_knowledge_graph(data, columns):
     with open('knowledge_graph.html', 'w', encoding='utf-8') as file:
         file.write(html_content)
 
-create_knowledge_graph(project_data, descriptors_data.columns)
+create_knowledge_graph(descriptors_data.values.tolist(), descriptors_data.columns)
 
 # Display the graph in the Streamlit app
 html_path = 'knowledge_graph.html'
@@ -122,7 +161,7 @@ try:
     with open(html_path, 'r', encoding='utf-8') as HtmlFile:
         html_content = HtmlFile.read()
 
-    components.html(html_content, height=800, width=1000)
+    components.html(html_content, height=1000, width=1000)
 
 except FileNotFoundError:
     st.warning(f"HTML file not found at {html_path}.")
@@ -138,8 +177,13 @@ st.markdown("""
 
 **Dive into details!**
 - **Choose an artist by clicking directly on their name**: When you select an artist, this will highlight all of the edges and nodes about this artist!
-
+- **Explore genres, stages, and days**: Now you can also see which genres are performing on specific stages and days by selecting a genre, stage name, or set day from the dropdown menu.
+- **Filter edges for deeper insight**: Use the edge filter options ("to" and "from") to understand the relationships better. For example, you can see which artists are performing at a specific stage or on a particular day, and which genres are associated with a stage or day.
 - **Reset Selection** by clicking "Reset Selection" to clear the current filter and return the graph to its default view, showing all nodes and edges.
-            
+- **Pls ignore** the 'edge'>>'id'>> filtering function, it's showing the unique identifiers instead of labels, idk how to fix it >.< !!
+
 ## Hope you enjoy this! - Liezl teehee <3 
+Wanna fork this code and make your own? Here's my [GitHub](https://github.com/liezzzlll). 
+
+[My personal site](https://liezzzlll.github.io/liezzzlll/) 
 """)
