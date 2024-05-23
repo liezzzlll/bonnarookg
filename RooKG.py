@@ -23,23 +23,7 @@ color_map = {
 }
 
 # Create a Network graph object
-net = Network(notebook=True, width="1200px", height="720px", cdn_resources='remote', font_color='white', bgcolor="black", select_menu=True, filter_menu=False)
-
-# Adjust jiggle physics
-net.set_options("""
-var options = {
-  "physics": {
-    "barnesHut": {
-      "gravitationalConstant": -50000,
-      "centralGravity": 0.2,
-      "springLength": 250,
-      "springConstant": 0.05,
-      "damping": 0.1
-    },
-    "minVelocity": 0.5
-  }
-}
-""")
+net = Network(notebook=True, width="1200px", height="720px", cdn_resources='remote', font_color='white', bgcolor="#222222", select_menu=True, filter_menu=False)
 
 st.title('Bonnaroo 2024 Music Festival Knowledge Graph')
 
@@ -82,9 +66,7 @@ shape_map = {
     'Stage Name': 'square',
 }
 
-def create_knowledge_graph(data, columns):
-    # Initialize the network
-    net = Network(notebook=True)
+def create_knowledge_graph(data, columns): 
     
     # Calculate the frequency of each genre
     genre_frequency = Counter()
@@ -98,9 +80,6 @@ def create_knowledge_graph(data, columns):
     min_size = 30        # Minimum size for genre nodes
     artist_size = 15     # Fixed size for artist nodes
 
-    # Debug: write max frequency
-    st.write("Max Frequency:", max_frequency)
-
     # Add nodes and edges to the network
     for entry in data:
         artist = entry[columns.get_loc('Artist')]
@@ -110,8 +89,6 @@ def create_knowledge_graph(data, columns):
         for genre in genres:
             frequency = genre_frequency[genre]
             node_size = min_size + scaling_factor * (frequency / max_frequency)  # Ensure minimum size
-            # Debug: write node size for each genre
-            st.write(f"Genre: {genre}, Frequency: {frequency}, Node Size: {node_size}")
             net.add_node(genre, label=genre, title=genre, color=color_map['Genre'], size=node_size, shape=shape_map['Genre'])
             net.add_edge(genre, artist)
 

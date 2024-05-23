@@ -1,0 +1,701 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+                <link href="lib/tom-select/tom-select.css" rel="stylesheet">
+                <script src="lib/tom-select/tom-select.complete.min.js"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #222222;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 750px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+                <div id="select-menu" class="card-header">
+                    <div class="row no-gutters">
+                        <div class="col-10 pb-2">
+                            <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="selectNode([value]);"
+                            id="select-node"
+                            placeholder="Select node..."
+                            >
+                                <option selected>Select a Node by ID</option>
+                                
+                                    <option value="49 Winchester">49 Winchester</option>
+                                
+                                    <option value="Country">Country</option>
+                                
+                                    <option value="Friday">Friday</option>
+                                
+                                    <option value="Which">Which</option>
+                                
+                                    <option value="Centeroo">Centeroo</option>
+                                
+                                    <option value="A eon:mode">A eon:mode</option>
+                                
+                                    <option value="Electronic">Electronic</option>
+                                
+                                    <option value="Drum & Bass">Drum & Bass</option>
+                                
+                                    <option value="Wednesday">Wednesday</option>
+                                
+                                    <option value="With">With</option>
+                                
+                                    <option value="Outeroo">Outeroo</option>
+                                
+                                    <option value="Abby Holliday">Abby Holliday</option>
+                                
+                                    <option value="Pop">Pop</option>
+                                
+                                    <option value="Indie">Indie</option>
+                                
+                                    <option value="UNK">UNK</option>
+                                
+                                    <option value="Alleycvt">Alleycvt</option>
+                                
+                                    <option value="Tuesday">Tuesday</option>
+                                
+                                    <option value="Amira Elfeky">Amira Elfeky</option>
+                                
+                                    <option value="Alt Rock">Alt Rock</option>
+                                
+                                    <option value="Rock">Rock</option>
+                                
+                                    <option value="Angel White">Angel White</option>
+                                
+                                    <option value="Galactic">Galactic</option>
+                                
+                                    <option value="Armand Hammer">Armand Hammer</option>
+                                
+                                    <option value="Hip-Hop">Hip-Hop</option>
+                                
+                                    <option value="Sunday">Sunday</option>
+                                
+                                    <option value="That">That</option>
+                                
+                                    <option value="Ashnikko">Ashnikko</option>
+                                
+                                    <option value="Baby Queen">Baby Queen</option>
+                                
+                                    <option value="This">This</option>
+                                
+                                    <option value="Badbadnot Good">Badbadnot Good</option>
+                                
+                                    <option value="Soul and R&B">Soul and R&B</option>
+                                
+                                    <option value="Jazz">Jazz</option>
+                                
+                                    <option value="Bakar">Bakar</option>
+                                
+                                    <option value="Saturday">Saturday</option>
+                                
+                                    <option value="BigXThaPlug">BigXThaPlug</option>
+                                
+                                    <option value="Thursday">Thursday</option>
+                                
+                                    <option value="Bonnie Light Horseman">Bonnie Light Horseman</option>
+                                
+                                    <option value="Folk">Folk</option>
+                                
+                                    <option value="Bonny Light Horseman">Bonny Light Horseman</option>
+                                
+                                    <option value="Boot Scootin' Boogie Nights">Boot Scootin' Boogie Nights</option>
+                                
+                                    <option value="Brittany Howard">Brittany Howard</option>
+                                
+                                    <option value="Cage the Elephant">Cage the Elephant</option>
+                                
+                                    <option value="What">What</option>
+                                
+                                    <option value="Cale Tyson">Cale Tyson</option>
+                                
+                                    <option value="Carly Rae Jepsen">Carly Rae Jepsen</option>
+                                
+                                    <option value="Chapel Hart">Chapel Hart</option>
+                                
+                                    <option value="Chappell Roan">Chappell Roan</option>
+                                
+                                    <option value="Charles Wesley Godwin">Charles Wesley Godwin</option>
+                                
+                                    <option value="Chase & Status">Chase & Status</option>
+                                
+                                    <option value="Cigarettes After Sex">Cigarettes After Sex</option>
+                                
+                                    <option value="Crowe Boys">Crowe Boys</option>
+                                
+                                    <option value="D4VD">D4VD</option>
+                                
+                                    <option value="Dan Spencer">Dan Spencer</option>
+                                
+                                    <option value="Dasha">Dasha</option>
+                                
+                                    <option value="Dashboard Confessional Emo Superjam">Dashboard Confessional Emo Superjam</option>
+                                
+                                    <option value="Alt Elect.">Alt Elect.</option>
+                                
+                                    <option value="David Kushner">David Kushner</option>
+                                
+                                    <option value="Deadroom">Deadroom</option>
+                                
+                                    <option value="House">House</option>
+                                
+                                    <option value="Dubstep">Dubstep</option>
+                                
+                                    <option value="Dean Johnson">Dean Johnson</option>
+                                
+                                    <option value="Deeper Purpose">Deeper Purpose</option>
+                                
+                                    <option value="Techno">Techno</option>
+                                
+                                    <option value="Diplo">Diplo</option>
+                                
+                                    <option value="Other">Other</option>
+                                
+                                    <option value="Disco Lines">Disco Lines</option>
+                                
+                                    <option value="Dombrance">Dombrance</option>
+                                
+                                    <option value="Dominic Fike">Dominic Fike</option>
+                                
+                                    <option value="Dr. Fresch">Dr. Fresch</option>
+                                
+                                    <option value="Trap">Trap</option>
+                                
+                                    <option value="Durand Bernarr">Durand Bernarr</option>
+                                
+                                    <option value="Eggy">Eggy</option>
+                                
+                                    <option value="Jam">Jam</option>
+                                
+                                    <option value="Eli Winders">Eli Winders</option>
+                                
+                                    <option value="Ethel Cain">Ethel Cain</option>
+                                
+                                    <option value="Faye Webster">Faye Webster</option>
+                                
+                                    <option value="Fisher">Fisher</option>
+                                
+                                    <option value="Flying Mojito Bros">Flying Mojito Bros</option>
+                                
+                                    <option value="Four Tet">Four Tet</option>
+                                
+                                    <option value="Frayne Vibez">Frayne Vibez</option>
+                                
+                                    <option value="Fred Again..">Fred Again..</option>
+                                
+                                    <option value="Galantis">Galantis</option>
+                                
+                                    <option value="Gary Clark Jr.">Gary Clark Jr.</option>
+                                
+                                    <option value="Blues">Blues</option>
+                                
+                                    <option value="Geese">Geese</option>
+                                
+                                    <option value="Goth Babe">Goth Babe</option>
+                                
+                                    <option value="Greensky Bluegrass">Greensky Bluegrass</option>
+                                
+                                    <option value="Bluegrass">Bluegrass</option>
+                                
+                                    <option value="Gregory Alan Isakov">Gregory Alan Isakov</option>
+                                
+                                    <option value="Grouplove">Grouplove</option>
+                                
+                                    <option value="Gwar">Gwar</option>
+                                
+                                    <option value="Metal">Metal</option>
+                                
+                                    <option value="Half Moon Run">Half Moon Run</option>
+                                
+                                    <option value="Hamdi">Hamdi</option>
+                                
+                                    <option value="Hank">Hank</option>
+                                
+                                    <option value="Hans Williams">Hans Williams</option>
+                                
+                                    <option value="Happy Landing">Happy Landing</option>
+                                
+                                    <option value="HoneyLuv">HoneyLuv</option>
+                                
+                                    <option value="Houseplant">Houseplant</option>
+                                
+                                    <option value="Idles">Idles</option>
+                                
+                                    <option value="Punk">Punk</option>
+                                
+                                    <option value="Infinity Song">Infinity Song</option>
+                                
+                                    <option value="Interpol">Interpol</option>
+                                
+                                    <option value="Irreversible Entanglements">Irreversible Entanglements</option>
+                                
+                                    <option value="IsoXO">IsoXO</option>
+                                
+                                    <option value="It's Murph">It's Murph</option>
+                                
+                                    <option value="Jake Wesley Rogers">Jake Wesley Rogers</option>
+                                
+                                    <option value="Jason Isbell">Jason Isbell</option>
+                                
+                                    <option value="Jason Ross">Jason Ross</option>
+                                
+                                    <option value="Melodic Dubstep">Melodic Dubstep</option>
+                                
+                                    <option value="Jessica Audiffred">Jessica Audiffred</option>
+                                
+                                    <option value="Jive Talk">Jive Talk</option>
+                                
+                                    <option value="Jobi Riccio">Jobi Riccio</option>
+                                
+                                    <option value="Joe Russo">Joe Russo</option>
+                                
+                                    <option value="Joey Bada$$">Joey Bada$$</option>
+                                
+                                    <option value="Jon Batiste">Jon Batiste</option>
+                                
+                                    <option value="Josiah & the Bonnevilles">Josiah & the Bonnevilles</option>
+                                
+                                    <option value="Kasablanca">Kasablanca</option>
+                                
+                                    <option value="Kat Hasty">Kat Hasty</option>
+                                
+                                    <option value="Key Glock">Key Glock</option>
+                                
+                                    <option value="Khruangbin">Khruangbin</option>
+                                
+                                    <option value="Psych">Psych</option>
+                                
+                                    <option value="Funk">Funk</option>
+                                
+                                    <option value="Kill Safari">Kill Safari</option>
+                                
+                                    <option value="Knock2">Knock2</option>
+                                
+                                    <option value="Kyle Watson">Kyle Watson</option>
+                                
+                                    <option value="Larkin Poe">Larkin Poe</option>
+                                
+                                    <option value="Last Heroes">Last Heroes</option>
+                                
+                                    <option value="Libianca">Libianca</option>
+                                
+                                    <option value="Afrobeat">Afrobeat</option>
+                                
+                                    <option value="Lily Fitts">Lily Fitts</option>
+                                
+                                    <option value="Lizzy McAlpine">Lizzy McAlpine</option>
+                                
+                                    <option value="Lovra">Lovra</option>
+                                
+                                    <option value="Lowdown Brass Band">Lowdown Brass Band</option>
+                                
+                                    <option value="Lyny">Lyny</option>
+                                
+                                    <option value="Machinedrum">Machinedrum</option>
+                                
+                                    <option value="Maggie Antone">Maggie Antone</option>
+                                
+                                    <option value="Maggie Rogers">Maggie Rogers</option>
+                                
+                                    <option value="Manwolves">Manwolves</option>
+                                
+                                    <option value="Progressive">Progressive</option>
+                                
+                                    <option value="Matt Maltese">Matt Maltese</option>
+                                
+                                    <option value="Matt Schuster">Matt Schuster</option>
+                                
+                                    <option value="Mdou Moctar">Mdou Moctar</option>
+                                
+                                    <option value="Medium Build">Medium Build</option>
+                                
+                                    <option value="Megan Thee Stallion">Megan Thee Stallion</option>
+                                
+                                    <option value="Melanie Martinez">Melanie Martinez</option>
+                                
+                                    <option value="Art Pop">Art Pop</option>
+                                
+                                    <option value="Michigander">Michigander</option>
+                                
+                                    <option value="Mike">Mike</option>
+                                
+                                    <option value="Mike.">Mike.</option>
+                                
+                                    <option value="Militarie Gun">Militarie Gun</option>
+                                
+                                    <option value="Milky Chance">Milky Chance</option>
+                                
+                                    <option value="Molly Grace">Molly Grace</option>
+                                
+                                    <option value="Mon Rovia">Mon Rovia</option>
+                                
+                                    <option value="Mono Means One">Mono Means One</option>
+                                
+                                    <option value="Groop">Groop</option>
+                                
+                                    <option value="Muckers">Muckers</option>
+                                
+                                    <option value="Nala">Nala</option>
+                                
+                                    <option value="Nation of Language">Nation of Language</option>
+                                
+                                    <option value="Neal Francis">Neal Francis</option>
+                                
+                                    <option value="Neil Frances">Neil Frances</option>
+                                
+                                    <option value="Nobody's Dancing">Nobody's Dancing</option>
+                                
+                                    <option value="Ocie Elliott">Ocie Elliott</option>
+                                
+                                    <option value="Oliver Heldons">Oliver Heldons</option>
+                                
+                                    <option value="Parcels">Parcels</option>
+                                
+                                    <option value="Paul McDonald">Paul McDonald</option>
+                                
+                                    <option value="Pocket">Pocket</option>
+                                
+                                    <option value="Post Malone">Post Malone</option>
+                                
+                                    <option value="Pretty Lights">Pretty Lights</option>
+                                
+                                    <option value="Rae and the Ragdolls">Rae and the Ragdolls</option>
+                                
+                                    <option value="Ranger Trucco">Ranger Trucco</option>
+                                
+                                    <option value="Red Hot Chili Peppers">Red Hot Chili Peppers</option>
+                                
+                                    <option value="Renée Rapp">Renée Rapp</option>
+                                
+                                    <option value="Róisín Murphy">Róisín Murphy</option>
+                                
+                                    <option value="Ryan Beatty">Ryan Beatty</option>
+                                
+                                    <option value="S.G. Goodman">S.G. Goodman</option>
+                                
+                                    <option value="Saffron Stone">Saffron Stone</option>
+                                
+                                    <option value="Sawyer Hill">Sawyer Hill</option>
+                                
+                                    <option value="Say She She">Say She She</option>
+                                
+                                    <option value="Sean Paul">Sean Paul</option>
+                                
+                                    <option value="Reggae">Reggae</option>
+                                
+                                    <option value="Secret Headliner">Secret Headliner</option>
+                                
+                                    <option value="Seven Lions">Seven Lions</option>
+                                
+                                    <option value="Shy Fx">Shy Fx</option>
+                                
+                                    <option value="Sicaria">Sicaria</option>
+                                
+                                    <option value="Sid Sriram">Sid Sriram</option>
+                                
+                                    <option value="Star Seed">Star Seed</option>
+                                
+                                    <option value="Stoley">Stoley</option>
+                                
+                                    <option value="Svdden Death">Svdden Death</option>
+                                
+                                    <option value="Taking Back Sunday">Taking Back Sunday</option>
+                                
+                                    <option value="Tanner Usrey">Tanner Usrey</option>
+                                
+                                    <option value="Taylor Hunnicutt">Taylor Hunnicutt</option>
+                                
+                                    <option value="Teezo Touchdown">Teezo Touchdown</option>
+                                
+                                    <option value="Texas Hill">Texas Hill</option>
+                                
+                                    <option value="The Beaches">The Beaches</option>
+                                
+                                    <option value="The Driver Era">The Driver Era</option>
+                                
+                                    <option value="The Foxes">The Foxes</option>
+                                
+                                    <option value="The Garden">The Garden</option>
+                                
+                                    <option value="The Heavy Heavy">The Heavy Heavy</option>
+                                
+                                    <option value="The Japanese-House">The Japanese-House</option>
+                                
+                                    <option value="The Maine">The Maine</option>
+                                
+                                    <option value="The Mars Volta">The Mars Volta</option>
+                                
+                                    <option value="The Teskey Brothers">The Teskey Brothers</option>
+                                
+                                    <option value="Thundercat">Thundercat</option>
+                                
+                                    <option value="Tors">Tors</option>
+                                
+                                    <option value="T-Pain">T-Pain</option>
+                                
+                                    <option value="Trousdale">Trousdale</option>
+                                
+                                    <option value="Tsha">Tsha</option>
+                                
+                                    <option value="TV Girl">TV Girl</option>
+                                
+                                    <option value="Two Friends">Two Friends</option>
+                                
+                                    <option value="Tyler Halverson">Tyler Halverson</option>
+                                
+                                    <option value="Vandelux">Vandelux</option>
+                                
+                                    <option value="Veggi">Veggi</option>
+                                
+                                    <option value="Vincent Lima">Vincent Lima</option>
+                                
+                                    <option value="VNSSA">VNSSA</option>
+                                
+                                    <option value="Whyte Fang">Whyte Fang</option>
+                                
+                                    <option value="Will Jones">Will Jones</option>
+                                
+                                    <option value="Winyah">Winyah</option>
+                                
+                                    <option value="Wolves of Glendale">Wolves of Glendale</option>
+                                
+                                    <option value="Comedy">Comedy</option>
+                                
+                                    <option value="Yer Flowers">Yer Flowers</option>
+                                
+                                    <option value="Yetep">Yetep</option>
+                                
+                                    <option value="Yves Tumor">Yves Tumor</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-2 pb-2">
+                            <button type="button" class="btn btn-primary btn-block" onclick="neighbourhoodHighlight({nodes: []});">Reset Selection</button>
+                        </div>
+                    </div>
+                </div>
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+                  new TomSelect("#select-node",{
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      }
+                  });
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#ffcc00", "font": {"color": "white"}, "id": "49 Winchester", "label": "49 Winchester", "shape": "dot", "title": "49 Winchester"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Country", "label": "Country", "shape": "star", "size": 240, "title": "Country"}, {"color": "#2ca02c", "font": {"color": "white"}, "id": "Friday", "label": "Friday", "shape": "dot", "title": "Friday"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "Which", "label": "Which", "shape": "square", "title": "Which"}, {"color": "#9467bd", "font": {"color": "white"}, "id": "Centeroo", "label": "Centeroo", "shape": "triangle", "title": "Centeroo"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "A eon:mode", "label": "A eon:mode", "shape": "dot", "title": "A eon:mode"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Electronic", "label": "Electronic", "shape": "star", "size": 500, "title": "Electronic"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Drum \u0026 Bass", "label": "Drum \u0026 Bass", "shape": "star", "size": 40, "title": "Drum \u0026 Bass"}, {"color": "#2ca02c", "font": {"color": "white"}, "id": "Wednesday", "label": "Wednesday", "shape": "dot", "title": "Wednesday"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "With", "label": "With", "shape": "square", "title": "With"}, {"color": "#9467bd", "font": {"color": "white"}, "id": "Outeroo", "label": "Outeroo", "shape": "triangle", "title": "Outeroo"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Abby Holliday", "label": "Abby Holliday", "shape": "dot", "title": "Abby Holliday"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Pop", "label": "Pop", "shape": "star", "size": 580, "title": "Pop"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Indie", "label": "Indie", "shape": "star", "size": 370, "title": "Indie"}, {"color": "#2ca02c", "font": {"color": "white"}, "id": "UNK", "label": "UNK", "shape": "dot", "title": "UNK"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Alleycvt", "label": "Alleycvt", "shape": "dot", "title": "Alleycvt"}, {"color": "#2ca02c", "font": {"color": "white"}, "id": "Tuesday", "label": "Tuesday", "shape": "dot", "title": "Tuesday"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Amira Elfeky", "label": "Amira Elfeky", "shape": "dot", "title": "Amira Elfeky"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Alt Rock", "label": "Alt Rock", "shape": "star", "size": 140, "title": "Alt Rock"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Rock", "label": "Rock", "shape": "star", "size": 430, "title": "Rock"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Angel White", "label": "Angel White", "shape": "dot", "title": "Angel White"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "Galactic", "label": "Galactic", "shape": "square", "title": "Galactic"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Armand Hammer", "label": "Armand Hammer", "shape": "dot", "title": "Armand Hammer"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Hip-Hop", "label": "Hip-Hop", "shape": "star", "size": 120, "title": "Hip-Hop"}, {"color": "#2ca02c", "font": {"color": "white"}, "id": "Sunday", "label": "Sunday", "shape": "dot", "title": "Sunday"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "That", "label": "That", "shape": "square", "title": "That"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Ashnikko", "label": "Ashnikko", "shape": "dot", "title": "Ashnikko"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Baby Queen", "label": "Baby Queen", "shape": "dot", "title": "Baby Queen"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "This", "label": "This", "shape": "square", "title": "This"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Badbadnot Good", "label": "Badbadnot Good", "shape": "dot", "title": "Badbadnot Good"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Soul and R\u0026B", "label": "Soul and R\u0026B", "shape": "star", "size": 120, "title": "Soul and R\u0026B"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Jazz", "label": "Jazz", "shape": "star", "size": 50, "title": "Jazz"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Bakar", "label": "Bakar", "shape": "dot", "title": "Bakar"}, {"color": "#2ca02c", "font": {"color": "white"}, "id": "Saturday", "label": "Saturday", "shape": "dot", "title": "Saturday"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "BigXThaPlug", "label": "BigXThaPlug", "shape": "dot", "title": "BigXThaPlug"}, {"color": "#2ca02c", "font": {"color": "white"}, "id": "Thursday", "label": "Thursday", "shape": "dot", "title": "Thursday"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Bonnie Light Horseman", "label": "Bonnie Light Horseman", "shape": "dot", "title": "Bonnie Light Horseman"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Folk", "label": "Folk", "shape": "star", "size": 350, "title": "Folk"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Bonny Light Horseman", "label": "Bonny Light Horseman", "shape": "dot", "title": "Bonny Light Horseman"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Boot Scootin\u0027 Boogie Nights", "label": "Boot Scootin\u0027 Boogie Nights", "shape": "dot", "title": "Boot Scootin\u0027 Boogie Nights"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Brittany Howard", "label": "Brittany Howard", "shape": "dot", "title": "Brittany Howard"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Cage the Elephant", "label": "Cage the Elephant", "shape": "dot", "title": "Cage the Elephant"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "What", "label": "What", "shape": "square", "title": "What"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Cale Tyson", "label": "Cale Tyson", "shape": "dot", "title": "Cale Tyson"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Carly Rae Jepsen", "label": "Carly Rae Jepsen", "shape": "dot", "title": "Carly Rae Jepsen"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Chapel Hart", "label": "Chapel Hart", "shape": "dot", "title": "Chapel Hart"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Chappell Roan", "label": "Chappell Roan", "shape": "dot", "title": "Chappell Roan"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Charles Wesley Godwin", "label": "Charles Wesley Godwin", "shape": "dot", "title": "Charles Wesley Godwin"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Chase \u0026 Status", "label": "Chase \u0026 Status", "shape": "dot", "title": "Chase \u0026 Status"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Cigarettes After Sex", "label": "Cigarettes After Sex", "shape": "dot", "title": "Cigarettes After Sex"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Crowe Boys", "label": "Crowe Boys", "shape": "dot", "title": "Crowe Boys"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "D4VD", "label": "D4VD", "shape": "dot", "title": "D4VD"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Dan Spencer", "label": "Dan Spencer", "shape": "dot", "title": "Dan Spencer"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Dasha", "label": "Dasha", "shape": "dot", "title": "Dasha"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Dashboard Confessional Emo Superjam", "label": "Dashboard Confessional Emo Superjam", "shape": "dot", "title": "Dashboard Confessional Emo Superjam"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Alt Elect.", "label": "Alt Elect.", "shape": "star", "size": 50, "title": "Alt Elect."}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "David Kushner", "label": "David Kushner", "shape": "dot", "title": "David Kushner"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Deadroom", "label": "Deadroom", "shape": "dot", "title": "Deadroom"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "House", "label": "House", "shape": "star", "size": 230, "title": "House"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Dubstep", "label": "Dubstep", "shape": "star", "size": 80, "title": "Dubstep"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Dean Johnson", "label": "Dean Johnson", "shape": "dot", "title": "Dean Johnson"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Deeper Purpose", "label": "Deeper Purpose", "shape": "dot", "title": "Deeper Purpose"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Techno", "label": "Techno", "shape": "star", "size": 40, "title": "Techno"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Diplo", "label": "Diplo", "shape": "dot", "title": "Diplo"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "Other", "label": "Other", "shape": "square", "title": "Other"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Disco Lines", "label": "Disco Lines", "shape": "dot", "title": "Disco Lines"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Dombrance", "label": "Dombrance", "shape": "dot", "title": "Dombrance"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Dominic Fike", "label": "Dominic Fike", "shape": "dot", "title": "Dominic Fike"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Dr. Fresch", "label": "Dr. Fresch", "shape": "dot", "title": "Dr. Fresch"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Trap", "label": "Trap", "shape": "star", "size": 40, "title": "Trap"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Durand Bernarr", "label": "Durand Bernarr", "shape": "dot", "title": "Durand Bernarr"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Eggy", "label": "Eggy", "shape": "dot", "title": "Eggy"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Jam", "label": "Jam", "shape": "star", "size": 50, "title": "Jam"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Eli Winders", "label": "Eli Winders", "shape": "dot", "title": "Eli Winders"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Ethel Cain", "label": "Ethel Cain", "shape": "dot", "title": "Ethel Cain"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Faye Webster", "label": "Faye Webster", "shape": "dot", "title": "Faye Webster"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Fisher", "label": "Fisher", "shape": "dot", "title": "Fisher"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Flying Mojito Bros", "label": "Flying Mojito Bros", "shape": "dot", "title": "Flying Mojito Bros"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Four Tet", "label": "Four Tet", "shape": "dot", "title": "Four Tet"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Frayne Vibez", "label": "Frayne Vibez", "shape": "dot", "title": "Frayne Vibez"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Fred Again..", "label": "Fred Again..", "shape": "dot", "title": "Fred Again.."}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Galantis", "label": "Galantis", "shape": "dot", "title": "Galantis"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Gary Clark Jr.", "label": "Gary Clark Jr.", "shape": "dot", "title": "Gary Clark Jr."}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Blues", "label": "Blues", "shape": "star", "size": 40, "title": "Blues"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Geese", "label": "Geese", "shape": "dot", "title": "Geese"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Goth Babe", "label": "Goth Babe", "shape": "dot", "title": "Goth Babe"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Greensky Bluegrass", "label": "Greensky Bluegrass", "shape": "dot", "title": "Greensky Bluegrass"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Bluegrass", "label": "Bluegrass", "shape": "star", "size": 10, "title": "Bluegrass"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Gregory Alan Isakov", "label": "Gregory Alan Isakov", "shape": "dot", "title": "Gregory Alan Isakov"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Grouplove", "label": "Grouplove", "shape": "dot", "title": "Grouplove"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Gwar", "label": "Gwar", "shape": "dot", "title": "Gwar"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Metal", "label": "Metal", "shape": "star", "size": 10, "title": "Metal"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Half Moon Run", "label": "Half Moon Run", "shape": "dot", "title": "Half Moon Run"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Hamdi", "label": "Hamdi", "shape": "dot", "title": "Hamdi"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Hank", "label": "Hank", "shape": "dot", "title": "Hank"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Hans Williams", "label": "Hans Williams", "shape": "dot", "title": "Hans Williams"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Happy Landing", "label": "Happy Landing", "shape": "dot", "title": "Happy Landing"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "HoneyLuv", "label": "HoneyLuv", "shape": "dot", "title": "HoneyLuv"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Houseplant", "label": "Houseplant", "shape": "dot", "title": "Houseplant"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Idles", "label": "Idles", "shape": "dot", "title": "Idles"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Punk", "label": "Punk", "shape": "star", "size": 50, "title": "Punk"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Infinity Song", "label": "Infinity Song", "shape": "dot", "title": "Infinity Song"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Interpol", "label": "Interpol", "shape": "dot", "title": "Interpol"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Irreversible Entanglements", "label": "Irreversible Entanglements", "shape": "dot", "title": "Irreversible Entanglements"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "IsoXO", "label": "IsoXO", "shape": "dot", "title": "IsoXO"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "It\u0027s Murph", "label": "It\u0027s Murph", "shape": "dot", "title": "It\u0027s Murph"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Jake Wesley Rogers", "label": "Jake Wesley Rogers", "shape": "dot", "title": "Jake Wesley Rogers"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Jason Isbell", "label": "Jason Isbell", "shape": "dot", "title": "Jason Isbell"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Jason Ross", "label": "Jason Ross", "shape": "dot", "title": "Jason Ross"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Melodic Dubstep", "label": "Melodic Dubstep", "shape": "star", "size": 50, "title": "Melodic Dubstep"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Jessica Audiffred", "label": "Jessica Audiffred", "shape": "dot", "title": "Jessica Audiffred"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Jive Talk", "label": "Jive Talk", "shape": "dot", "title": "Jive Talk"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Jobi Riccio", "label": "Jobi Riccio", "shape": "dot", "title": "Jobi Riccio"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Joe Russo", "label": "Joe Russo", "shape": "dot", "title": "Joe Russo"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Joey Bada$$", "label": "Joey Bada$$", "shape": "dot", "title": "Joey Bada$$"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Jon Batiste", "label": "Jon Batiste", "shape": "dot", "title": "Jon Batiste"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Josiah \u0026 the Bonnevilles", "label": "Josiah \u0026 the Bonnevilles", "shape": "dot", "title": "Josiah \u0026 the Bonnevilles"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Kasablanca", "label": "Kasablanca", "shape": "dot", "title": "Kasablanca"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Kat Hasty", "label": "Kat Hasty", "shape": "dot", "title": "Kat Hasty"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Key Glock", "label": "Key Glock", "shape": "dot", "title": "Key Glock"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Khruangbin", "label": "Khruangbin", "shape": "dot", "title": "Khruangbin"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Psych", "label": "Psych", "shape": "star", "size": 40, "title": "Psych"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Funk", "label": "Funk", "shape": "star", "size": 70, "title": "Funk"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Kill Safari", "label": "Kill Safari", "shape": "dot", "title": "Kill Safari"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Knock2", "label": "Knock2", "shape": "dot", "title": "Knock2"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Kyle Watson", "label": "Kyle Watson", "shape": "dot", "title": "Kyle Watson"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Larkin Poe", "label": "Larkin Poe", "shape": "dot", "title": "Larkin Poe"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Last Heroes", "label": "Last Heroes", "shape": "dot", "title": "Last Heroes"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Libianca", "label": "Libianca", "shape": "dot", "title": "Libianca"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Afrobeat", "label": "Afrobeat", "shape": "star", "size": 10, "title": "Afrobeat"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Lily Fitts", "label": "Lily Fitts", "shape": "dot", "title": "Lily Fitts"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Lizzy McAlpine", "label": "Lizzy McAlpine", "shape": "dot", "title": "Lizzy McAlpine"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Lovra", "label": "Lovra", "shape": "dot", "title": "Lovra"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Lowdown Brass Band", "label": "Lowdown Brass Band", "shape": "dot", "title": "Lowdown Brass Band"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Lyny", "label": "Lyny", "shape": "dot", "title": "Lyny"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Machinedrum", "label": "Machinedrum", "shape": "dot", "title": "Machinedrum"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Maggie Antone", "label": "Maggie Antone", "shape": "dot", "title": "Maggie Antone"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Maggie Rogers", "label": "Maggie Rogers", "shape": "dot", "title": "Maggie Rogers"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Manwolves", "label": "Manwolves", "shape": "dot", "title": "Manwolves"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Progressive", "label": "Progressive", "shape": "star", "size": 20, "title": "Progressive"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Matt Maltese", "label": "Matt Maltese", "shape": "dot", "title": "Matt Maltese"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Matt Schuster", "label": "Matt Schuster", "shape": "dot", "title": "Matt Schuster"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Mdou Moctar", "label": "Mdou Moctar", "shape": "dot", "title": "Mdou Moctar"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Medium Build", "label": "Medium Build", "shape": "dot", "title": "Medium Build"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Megan Thee Stallion", "label": "Megan Thee Stallion", "shape": "dot", "title": "Megan Thee Stallion"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Melanie Martinez", "label": "Melanie Martinez", "shape": "dot", "title": "Melanie Martinez"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Art Pop", "label": "Art Pop", "shape": "star", "size": 20, "title": "Art Pop"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Michigander", "label": "Michigander", "shape": "dot", "title": "Michigander"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Mike", "label": "Mike", "shape": "dot", "title": "Mike"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Mike.", "label": "Mike.", "shape": "dot", "title": "Mike."}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Militarie Gun", "label": "Militarie Gun", "shape": "dot", "title": "Militarie Gun"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Milky Chance", "label": "Milky Chance", "shape": "dot", "title": "Milky Chance"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Molly Grace", "label": "Molly Grace", "shape": "dot", "title": "Molly Grace"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Mon Rovia", "label": "Mon Rovia", "shape": "dot", "title": "Mon Rovia"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Mono Means One", "label": "Mono Means One", "shape": "dot", "title": "Mono Means One"}, {"color": "#8c564b", "font": {"color": "white"}, "id": "Groop", "label": "Groop", "shape": "square", "title": "Groop"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Muckers", "label": "Muckers", "shape": "dot", "title": "Muckers"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Nala", "label": "Nala", "shape": "dot", "title": "Nala"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Nation of Language", "label": "Nation of Language", "shape": "dot", "title": "Nation of Language"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Neal Francis", "label": "Neal Francis", "shape": "dot", "title": "Neal Francis"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Neil Frances", "label": "Neil Frances", "shape": "dot", "title": "Neil Frances"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Nobody\u0027s Dancing", "label": "Nobody\u0027s Dancing", "shape": "dot", "title": "Nobody\u0027s Dancing"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Ocie Elliott", "label": "Ocie Elliott", "shape": "dot", "title": "Ocie Elliott"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Oliver Heldons", "label": "Oliver Heldons", "shape": "dot", "title": "Oliver Heldons"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Parcels", "label": "Parcels", "shape": "dot", "title": "Parcels"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Paul McDonald", "label": "Paul McDonald", "shape": "dot", "title": "Paul McDonald"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Pocket", "label": "Pocket", "shape": "dot", "title": "Pocket"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Post Malone", "label": "Post Malone", "shape": "dot", "title": "Post Malone"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Pretty Lights", "label": "Pretty Lights", "shape": "dot", "title": "Pretty Lights"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Rae and the Ragdolls", "label": "Rae and the Ragdolls", "shape": "dot", "title": "Rae and the Ragdolls"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Ranger Trucco", "label": "Ranger Trucco", "shape": "dot", "title": "Ranger Trucco"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Red Hot Chili Peppers", "label": "Red Hot Chili Peppers", "shape": "dot", "title": "Red Hot Chili Peppers"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Ren\u00e9e Rapp", "label": "Ren\u00e9e Rapp", "shape": "dot", "title": "Ren\u00e9e Rapp"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "R\u00f3is\u00edn Murphy", "label": "R\u00f3is\u00edn Murphy", "shape": "dot", "title": "R\u00f3is\u00edn Murphy"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Ryan Beatty", "label": "Ryan Beatty", "shape": "dot", "title": "Ryan Beatty"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "S.G. Goodman", "label": "S.G. Goodman", "shape": "dot", "title": "S.G. Goodman"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Saffron Stone", "label": "Saffron Stone", "shape": "dot", "title": "Saffron Stone"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Sawyer Hill", "label": "Sawyer Hill", "shape": "dot", "title": "Sawyer Hill"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Say She She", "label": "Say She She", "shape": "dot", "title": "Say She She"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Sean Paul", "label": "Sean Paul", "shape": "dot", "title": "Sean Paul"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Reggae", "label": "Reggae", "shape": "star", "size": 10, "title": "Reggae"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Secret Headliner", "label": "Secret Headliner", "shape": "dot", "title": "Secret Headliner"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Seven Lions", "label": "Seven Lions", "shape": "dot", "title": "Seven Lions"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Shy Fx", "label": "Shy Fx", "shape": "dot", "title": "Shy Fx"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Sicaria", "label": "Sicaria", "shape": "dot", "title": "Sicaria"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Sid Sriram", "label": "Sid Sriram", "shape": "dot", "title": "Sid Sriram"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Star Seed", "label": "Star Seed", "shape": "dot", "title": "Star Seed"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Stoley", "label": "Stoley", "shape": "dot", "title": "Stoley"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Svdden Death", "label": "Svdden Death", "shape": "dot", "title": "Svdden Death"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Taking Back Sunday", "label": "Taking Back Sunday", "shape": "dot", "title": "Taking Back Sunday"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Tanner Usrey", "label": "Tanner Usrey", "shape": "dot", "title": "Tanner Usrey"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Taylor Hunnicutt", "label": "Taylor Hunnicutt", "shape": "dot", "title": "Taylor Hunnicutt"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Teezo Touchdown", "label": "Teezo Touchdown", "shape": "dot", "title": "Teezo Touchdown"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Texas Hill", "label": "Texas Hill", "shape": "dot", "title": "Texas Hill"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Beaches", "label": "The Beaches", "shape": "dot", "title": "The Beaches"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Driver Era", "label": "The Driver Era", "shape": "dot", "title": "The Driver Era"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Foxes", "label": "The Foxes", "shape": "dot", "title": "The Foxes"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Garden", "label": "The Garden", "shape": "dot", "title": "The Garden"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Heavy Heavy", "label": "The Heavy Heavy", "shape": "dot", "title": "The Heavy Heavy"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Japanese-House", "label": "The Japanese-House", "shape": "dot", "title": "The Japanese-House"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Maine", "label": "The Maine", "shape": "dot", "title": "The Maine"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Mars Volta", "label": "The Mars Volta", "shape": "dot", "title": "The Mars Volta"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "The Teskey Brothers", "label": "The Teskey Brothers", "shape": "dot", "title": "The Teskey Brothers"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Thundercat", "label": "Thundercat", "shape": "dot", "title": "Thundercat"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Tors", "label": "Tors", "shape": "dot", "title": "Tors"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "T-Pain", "label": "T-Pain", "shape": "dot", "title": "T-Pain"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Trousdale", "label": "Trousdale", "shape": "dot", "title": "Trousdale"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Tsha", "label": "Tsha", "shape": "dot", "title": "Tsha"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "TV Girl", "label": "TV Girl", "shape": "dot", "title": "TV Girl"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Two Friends", "label": "Two Friends", "shape": "dot", "title": "Two Friends"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Tyler Halverson", "label": "Tyler Halverson", "shape": "dot", "title": "Tyler Halverson"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Vandelux", "label": "Vandelux", "shape": "dot", "title": "Vandelux"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Veggi", "label": "Veggi", "shape": "dot", "title": "Veggi"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Vincent Lima", "label": "Vincent Lima", "shape": "dot", "title": "Vincent Lima"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "VNSSA", "label": "VNSSA", "shape": "dot", "title": "VNSSA"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Whyte Fang", "label": "Whyte Fang", "shape": "dot", "title": "Whyte Fang"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Will Jones", "label": "Will Jones", "shape": "dot", "title": "Will Jones"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Winyah", "label": "Winyah", "shape": "dot", "title": "Winyah"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Wolves of Glendale", "label": "Wolves of Glendale", "shape": "dot", "title": "Wolves of Glendale"}, {"color": "#1f77b4", "font": {"color": "white"}, "id": "Comedy", "label": "Comedy", "shape": "star", "size": 10, "title": "Comedy"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Yer Flowers", "label": "Yer Flowers", "shape": "dot", "title": "Yer Flowers"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Yetep", "label": "Yetep", "shape": "dot", "title": "Yetep"}, {"color": "#ffcc00", "font": {"color": "white"}, "id": "Yves Tumor", "label": "Yves Tumor", "shape": "dot", "title": "Yves Tumor"}]);
+                  edges = new vis.DataSet([{"from": "49 Winchester", "to": "Country"}, {"from": "49 Winchester", "to": "Friday"}, {"from": "49 Winchester", "to": "Which"}, {"from": "49 Winchester", "to": "Centeroo"}, {"from": "A eon:mode", "to": "Electronic"}, {"from": "A eon:mode", "to": "Drum \u0026 Bass"}, {"from": "A eon:mode", "to": "Wednesday"}, {"from": "A eon:mode", "to": "With"}, {"from": "A eon:mode", "to": "Outeroo"}, {"from": "Abby Holliday", "to": "Pop"}, {"from": "Abby Holliday", "to": "Indie"}, {"from": "Abby Holliday", "to": "UNK"}, {"from": "Alleycvt", "to": "Pop"}, {"from": "Alleycvt", "to": "Electronic"}, {"from": "Alleycvt", "to": "Tuesday"}, {"from": "Alleycvt", "to": "With"}, {"from": "Alleycvt", "to": "Outeroo"}, {"from": "Amira Elfeky", "to": "Alt Rock"}, {"from": "Amira Elfeky", "to": "Rock"}, {"from": "Amira Elfeky", "to": "UNK"}, {"from": "Angel White", "to": "Country"}, {"from": "Angel White", "to": "Wednesday"}, {"from": "Angel White", "to": "Galactic"}, {"from": "Angel White", "to": "Outeroo"}, {"from": "Armand Hammer", "to": "Hip-Hop"}, {"from": "Armand Hammer", "to": "Sunday"}, {"from": "Armand Hammer", "to": "That"}, {"from": "Armand Hammer", "to": "Centeroo"}, {"from": "Ashnikko", "to": "Hip-Hop"}, {"from": "Ashnikko", "to": "Sunday"}, {"from": "Ashnikko", "to": "That"}, {"from": "Ashnikko", "to": "Centeroo"}, {"from": "Baby Queen", "to": "Pop"}, {"from": "Baby Queen", "to": "Friday"}, {"from": "Baby Queen", "to": "This"}, {"from": "Baby Queen", "to": "Centeroo"}, {"from": "Badbadnot Good", "to": "Soul and R\u0026B"}, {"from": "Badbadnot Good", "to": "Pop"}, {"from": "Badbadnot Good", "to": "Jazz"}, {"from": "Badbadnot Good", "to": "Sunday"}, {"from": "Badbadnot Good", "to": "That"}, {"from": "Badbadnot Good", "to": "Centeroo"}, {"from": "Bakar", "to": "Indie"}, {"from": "Bakar", "to": "Saturday"}, {"from": "Bakar", "to": "This"}, {"from": "Bakar", "to": "Centeroo"}, {"from": "BigXThaPlug", "to": "Hip-Hop"}, {"from": "BigXThaPlug", "to": "Thursday"}, {"from": "BigXThaPlug", "to": "This"}, {"from": "BigXThaPlug", "to": "Centeroo"}, {"from": "Bonnie Light Horseman", "to": "Folk"}, {"from": "Bonnie Light Horseman", "to": "UNK"}, {"from": "Bonny Light Horseman", "to": "Folk"}, {"from": "Bonny Light Horseman", "to": "Indie"}, {"from": "Bonny Light Horseman", "to": "Friday"}, {"from": "Bonny Light Horseman", "to": "This"}, {"from": "Bonny Light Horseman", "to": "Centeroo"}, {"from": "Boot Scootin\u0027 Boogie Nights", "to": "Country"}, {"from": "Boot Scootin\u0027 Boogie Nights", "to": "Wednesday"}, {"from": "Boot Scootin\u0027 Boogie Nights", "to": "Galactic"}, {"from": "Boot Scootin\u0027 Boogie Nights", "to": "Outeroo"}, {"from": "Brittany Howard", "to": "Soul and R\u0026B"}, {"from": "Brittany Howard", "to": "Pop"}, {"from": "Brittany Howard", "to": "Saturday"}, {"from": "Brittany Howard", "to": "Which"}, {"from": "Brittany Howard", "to": "Centeroo"}, {"from": "Cage the Elephant", "to": "Alt Rock"}, {"from": "Cage the Elephant", "to": "Rock"}, {"from": "Cage the Elephant", "to": "Saturday"}, {"from": "Cage the Elephant", "to": "What"}, {"from": "Cage the Elephant", "to": "Centeroo"}, {"from": "Cale Tyson", "to": "Country"}, {"from": "Cale Tyson", "to": "Folk"}, {"from": "Cale Tyson", "to": "UNK"}, {"from": "Carly Rae Jepsen", "to": "Pop"}, {"from": "Carly Rae Jepsen", "to": "Sunday"}, {"from": "Carly Rae Jepsen", "to": "What"}, {"from": "Carly Rae Jepsen", "to": "Centeroo"}, {"from": "Chapel Hart", "to": "Country"}, {"from": "Chapel Hart", "to": "Thursday"}, {"from": "Chapel Hart", "to": "Galactic"}, {"from": "Chapel Hart", "to": "Outeroo"}, {"from": "Chappell Roan", "to": "Indie"}, {"from": "Chappell Roan", "to": "Rock"}, {"from": "Chappell Roan", "to": "Pop"}, {"from": "Chappell Roan", "to": "Sunday"}, {"from": "Chappell Roan", "to": "This"}, {"from": "Chappell Roan", "to": "Centeroo"}, {"from": "Charles Wesley Godwin", "to": "Country"}, {"from": "Charles Wesley Godwin", "to": "Sunday"}, {"from": "Charles Wesley Godwin", "to": "Which"}, {"from": "Charles Wesley Godwin", "to": "Centeroo"}, {"from": "Chase \u0026 Status", "to": "Electronic"}, {"from": "Chase \u0026 Status", "to": "Drum \u0026 Bass"}, {"from": "Chase \u0026 Status", "to": "Wednesday"}, {"from": "Chase \u0026 Status", "to": "With"}, {"from": "Chase \u0026 Status", "to": "Outeroo"}, {"from": "Cigarettes After Sex", "to": "Alt Rock"}, {"from": "Cigarettes After Sex", "to": "Rock"}, {"from": "Cigarettes After Sex", "to": "Pop"}, {"from": "Cigarettes After Sex", "to": "Indie"}, {"from": "Cigarettes After Sex", "to": "Saturday"}, {"from": "Cigarettes After Sex", "to": "Which"}, {"from": "Cigarettes After Sex", "to": "Centeroo"}, {"from": "Crowe Boys", "to": "Country"}, {"from": "Crowe Boys", "to": "Folk"}, {"from": "Crowe Boys", "to": "Thursday"}, {"from": "Crowe Boys", "to": "Galactic"}, {"from": "Crowe Boys", "to": "Outeroo"}, {"from": "D4VD", "to": "Indie"}, {"from": "D4VD", "to": "Pop"}, {"from": "D4VD", "to": "Saturday"}, {"from": "D4VD", "to": "Which"}, {"from": "D4VD", "to": "Centeroo"}, {"from": "Dan Spencer", "to": "Indie"}, {"from": "Dan Spencer", "to": "Folk"}, {"from": "Dan Spencer", "to": "UNK"}, {"from": "Dasha", "to": "Country"}, {"from": "Dasha", "to": "UNK"}, {"from": "Dashboard Confessional Emo Superjam", "to": "Alt Rock"}, {"from": "Dashboard Confessional Emo Superjam", "to": "Alt Elect."}, {"from": "Dashboard Confessional Emo Superjam", "to": "Pop"}, {"from": "Dashboard Confessional Emo Superjam", "to": "Saturday"}, {"from": "Dashboard Confessional Emo Superjam", "to": "This"}, {"from": "Dashboard Confessional Emo Superjam", "to": "Centeroo"}, {"from": "David Kushner", "to": "Indie"}, {"from": "David Kushner", "to": "Folk"}, {"from": "David Kushner", "to": "Pop"}, {"from": "David Kushner", "to": "Friday"}, {"from": "David Kushner", "to": "That"}, {"from": "David Kushner", "to": "Centeroo"}, {"from": "Deadroom", "to": "House"}, {"from": "Deadroom", "to": "Electronic"}, {"from": "Deadroom", "to": "Dubstep"}, {"from": "Deadroom", "to": "Saturday"}, {"from": "Deadroom", "to": "With"}, {"from": "Deadroom", "to": "Outeroo"}, {"from": "Dean Johnson", "to": "Folk"}, {"from": "Dean Johnson", "to": "UNK"}, {"from": "Deeper Purpose", "to": "Techno"}, {"from": "Deeper Purpose", "to": "Electronic"}, {"from": "Deeper Purpose", "to": "House"}, {"from": "Deeper Purpose", "to": "Thursday"}, {"from": "Deeper Purpose", "to": "With"}, {"from": "Deeper Purpose", "to": "Outeroo"}, {"from": "Diplo", "to": "Pop"}, {"from": "Diplo", "to": "Electronic"}, {"from": "Diplo", "to": "Sunday"}, {"from": "Diplo", "to": "Other"}, {"from": "Diplo", "to": "Centeroo"}, {"from": "Disco Lines", "to": "House"}, {"from": "Disco Lines", "to": "Electronic"}, {"from": "Disco Lines", "to": "Thursday"}, {"from": "Disco Lines", "to": "Other"}, {"from": "Disco Lines", "to": "Centeroo"}, {"from": "Dombrance", "to": "Alt Elect."}, {"from": "Dombrance", "to": "Electronic"}, {"from": "Dombrance", "to": "Friday"}, {"from": "Dombrance", "to": "With"}, {"from": "Dombrance", "to": "Outeroo"}, {"from": "Dominic Fike", "to": "Pop"}, {"from": "Dominic Fike", "to": "Indie"}, {"from": "Dominic Fike", "to": "Friday"}, {"from": "Dominic Fike", "to": "What"}, {"from": "Dominic Fike", "to": "Centeroo"}, {"from": "Dr. Fresch", "to": "Trap"}, {"from": "Dr. Fresch", "to": "House"}, {"from": "Dr. Fresch", "to": "Electronic"}, {"from": "Dr. Fresch", "to": "Friday"}, {"from": "Dr. Fresch", "to": "Other"}, {"from": "Dr. Fresch", "to": "Centeroo"}, {"from": "Durand Bernarr", "to": "Soul and R\u0026B"}, {"from": "Durand Bernarr", "to": "Thursday"}, {"from": "Durand Bernarr", "to": "This"}, {"from": "Durand Bernarr", "to": "Centeroo"}, {"from": "Eggy", "to": "Jam"}, {"from": "Eggy", "to": "Thursday"}, {"from": "Eggy", "to": "This"}, {"from": "Eggy", "to": "Centeroo"}, {"from": "Eli Winders", "to": "Country"}, {"from": "Eli Winders", "to": "Folk"}, {"from": "Eli Winders", "to": "Saturday"}, {"from": "Eli Winders", "to": "Galactic"}, {"from": "Eli Winders", "to": "Outeroo"}, {"from": "Ethel Cain", "to": "Indie"}, {"from": "Ethel Cain", "to": "Pop"}, {"from": "Ethel Cain", "to": "Saturday"}, {"from": "Ethel Cain", "to": "That"}, {"from": "Ethel Cain", "to": "Centeroo"}, {"from": "Faye Webster", "to": "Rock"}, {"from": "Faye Webster", "to": "Indie"}, {"from": "Faye Webster", "to": "Folk"}, {"from": "Faye Webster", "to": "Pop"}, {"from": "Faye Webster", "to": "Friday"}, {"from": "Faye Webster", "to": "That"}, {"from": "Faye Webster", "to": "Centeroo"}, {"from": "Fisher", "to": "Techno"}, {"from": "Fisher", "to": "Electronic"}, {"from": "Fisher", "to": "House"}, {"from": "Fisher", "to": "Thursday"}, {"from": "Fisher", "to": "With"}, {"from": "Fisher", "to": "Outeroo"}, {"from": "Flying Mojito Bros", "to": "Electronic"}, {"from": "Flying Mojito Bros", "to": "Country"}, {"from": "Flying Mojito Bros", "to": "Rock"}, {"from": "Flying Mojito Bros", "to": "House"}, {"from": "Flying Mojito Bros", "to": "Wednesday"}, {"from": "Flying Mojito Bros", "to": "With"}, {"from": "Flying Mojito Bros", "to": "Outeroo"}, {"from": "Four Tet", "to": "Electronic"}, {"from": "Four Tet", "to": "Sunday"}, {"from": "Four Tet", "to": "Other"}, {"from": "Four Tet", "to": "Centeroo"}, {"from": "Frayne Vibez", "to": "Soul and R\u0026B"}, {"from": "Frayne Vibez", "to": "Pop"}, {"from": "Frayne Vibez", "to": "Sunday"}, {"from": "Frayne Vibez", "to": "Galactic"}, {"from": "Frayne Vibez", "to": "Outeroo"}, {"from": "Fred Again..", "to": "Pop"}, {"from": "Fred Again..", "to": "House"}, {"from": "Fred Again..", "to": "Electronic"}, {"from": "Fred Again..", "to": "Sunday"}, {"from": "Fred Again..", "to": "What"}, {"from": "Fred Again..", "to": "Centeroo"}, {"from": "Galantis", "to": "Pop"}, {"from": "Galantis", "to": "House"}, {"from": "Galantis", "to": "Electronic"}, {"from": "Galantis", "to": "Sunday"}, {"from": "Galantis", "to": "Other"}, {"from": "Galantis", "to": "Centeroo"}, {"from": "Gary Clark Jr.", "to": "Blues"}, {"from": "Gary Clark Jr.", "to": "Rock"}, {"from": "Gary Clark Jr.", "to": "Pop"}, {"from": "Gary Clark Jr.", "to": "Friday"}, {"from": "Gary Clark Jr.", "to": "Which"}, {"from": "Gary Clark Jr.", "to": "Centeroo"}, {"from": "Geese", "to": "Alt Rock"}, {"from": "Geese", "to": "Rock"}, {"from": "Geese", "to": "Thursday"}, {"from": "Geese", "to": "That"}, {"from": "Geese", "to": "Centeroo"}, {"from": "Goth Babe", "to": "Pop"}, {"from": "Goth Babe", "to": "Electronic"}, {"from": "Goth Babe", "to": "Sunday"}, {"from": "Goth Babe", "to": "Which"}, {"from": "Goth Babe", "to": "Centeroo"}, {"from": "Greensky Bluegrass", "to": "Jam"}, {"from": "Greensky Bluegrass", "to": "Bluegrass"}, {"from": "Greensky Bluegrass", "to": "Sunday"}, {"from": "Greensky Bluegrass", "to": "Which"}, {"from": "Greensky Bluegrass", "to": "Centeroo"}, {"from": "Gregory Alan Isakov", "to": "Folk"}, {"from": "Gregory Alan Isakov", "to": "Saturday"}, {"from": "Gregory Alan Isakov", "to": "That"}, {"from": "Gregory Alan Isakov", "to": "Centeroo"}, {"from": "Grouplove", "to": "Alt Rock"}, {"from": "Grouplove", "to": "Rock"}, {"from": "Grouplove", "to": "Friday"}, {"from": "Grouplove", "to": "This"}, {"from": "Grouplove", "to": "Centeroo"}, {"from": "Gwar", "to": "Metal"}, {"from": "Gwar", "to": "Rock"}, {"from": "Gwar", "to": "Friday"}, {"from": "Gwar", "to": "This"}, {"from": "Gwar", "to": "Centeroo"}, {"from": "Half Moon Run", "to": "Indie"}, {"from": "Half Moon Run", "to": "Rock"}, {"from": "Half Moon Run", "to": "Saturday"}, {"from": "Half Moon Run", "to": "That"}, {"from": "Half Moon Run", "to": "Centeroo"}, {"from": "Hamdi", "to": "Dubstep"}, {"from": "Hamdi", "to": "Electronic"}, {"from": "Hamdi", "to": "Friday"}, {"from": "Hamdi", "to": "Other"}, {"from": "Hamdi", "to": "Centeroo"}, {"from": "Hank", "to": "Techno"}, {"from": "Hank", "to": "Electronic"}, {"from": "Hank", "to": "House"}, {"from": "Hank", "to": "Thursday"}, {"from": "Hank", "to": "With"}, {"from": "Hank", "to": "Outeroo"}, {"from": "Hans Williams", "to": "Folk"}, {"from": "Hans Williams", "to": "Pop"}, {"from": "Hans Williams", "to": "UNK"}, {"from": "Happy Landing", "to": "Folk"}, {"from": "Happy Landing", "to": "Pop"}, {"from": "Happy Landing", "to": "UNK"}, {"from": "HoneyLuv", "to": "House"}, {"from": "HoneyLuv", "to": "Electronic"}, {"from": "HoneyLuv", "to": "Thursday"}, {"from": "HoneyLuv", "to": "Other"}, {"from": "HoneyLuv", "to": "Centeroo"}, {"from": "Houseplant", "to": "Jam"}, {"from": "Houseplant", "to": "UNK"}, {"from": "Idles", "to": "Punk"}, {"from": "Idles", "to": "Rock"}, {"from": "Idles", "to": "Sunday"}, {"from": "Idles", "to": "That"}, {"from": "Idles", "to": "Centeroo"}, {"from": "Infinity Song", "to": "Rock"}, {"from": "Infinity Song", "to": "Indie"}, {"from": "Infinity Song", "to": "Folk"}, {"from": "Infinity Song", "to": "Pop"}, {"from": "Infinity Song", "to": "UNK"}, {"from": "Interpol", "to": "Alt Rock"}, {"from": "Interpol", "to": "Rock"}, {"from": "Interpol", "to": "Indie"}, {"from": "Interpol", "to": "Friday"}, {"from": "Interpol", "to": "This"}, {"from": "Interpol", "to": "Centeroo"}, {"from": "Irreversible Entanglements", "to": "Jazz"}, {"from": "Irreversible Entanglements", "to": "Sunday"}, {"from": "Irreversible Entanglements", "to": "That"}, {"from": "Irreversible Entanglements", "to": "Centeroo"}, {"from": "IsoXO", "to": "Trap"}, {"from": "IsoXO", "to": "House"}, {"from": "IsoXO", "to": "Electronic"}, {"from": "IsoXO", "to": "Friday"}, {"from": "IsoXO", "to": "Other"}, {"from": "IsoXO", "to": "Centeroo"}, {"from": "It\u0027s Murph", "to": "House"}, {"from": "It\u0027s Murph", "to": "Electronic"}, {"from": "It\u0027s Murph", "to": "Thursday"}, {"from": "It\u0027s Murph", "to": "Other"}, {"from": "It\u0027s Murph", "to": "Centeroo"}, {"from": "Jake Wesley Rogers", "to": "Rock"}, {"from": "Jake Wesley Rogers", "to": "Sunday"}, {"from": "Jake Wesley Rogers", "to": "What"}, {"from": "Jake Wesley Rogers", "to": "Centeroo"}, {"from": "Jason Isbell", "to": "Country"}, {"from": "Jason Isbell", "to": "Folk"}, {"from": "Jason Isbell", "to": "Sunday"}, {"from": "Jason Isbell", "to": "Which"}, {"from": "Jason Isbell", "to": "Centeroo"}, {"from": "Jason Ross", "to": "Melodic Dubstep"}, {"from": "Jason Ross", "to": "Electronic"}, {"from": "Jason Ross", "to": "Sunday"}, {"from": "Jason Ross", "to": "With"}, {"from": "Jason Ross", "to": "Outeroo"}, {"from": "Jessica Audiffred", "to": "Dubstep"}, {"from": "Jessica Audiffred", "to": "Electronic"}, {"from": "Jessica Audiffred", "to": "Friday"}, {"from": "Jessica Audiffred", "to": "Other"}, {"from": "Jessica Audiffred", "to": "Centeroo"}, {"from": "Jive Talk", "to": "Indie"}, {"from": "Jive Talk", "to": "Rock"}, {"from": "Jive Talk", "to": "Pop"}, {"from": "Jive Talk", "to": "Wednesday"}, {"from": "Jive Talk", "to": "Galactic"}, {"from": "Jive Talk", "to": "Outeroo"}, {"from": "Jobi Riccio", "to": "Country"}, {"from": "Jobi Riccio", "to": "Indie"}, {"from": "Jobi Riccio", "to": "Folk"}, {"from": "Jobi Riccio", "to": "Sunday"}, {"from": "Jobi Riccio", "to": "Galactic"}, {"from": "Jobi Riccio", "to": "Outeroo"}, {"from": "Joe Russo", "to": "Jam"}, {"from": "Joe Russo", "to": "Friday"}, {"from": "Joe Russo", "to": "That"}, {"from": "Joe Russo", "to": "Centeroo"}, {"from": "Joey Bada$$", "to": "Hip-Hop"}, {"from": "Joey Bada$$", "to": "Sunday"}, {"from": "Joey Bada$$", "to": "That"}, {"from": "Joey Bada$$", "to": "Centeroo"}, {"from": "Jon Batiste", "to": "Soul and R\u0026B"}, {"from": "Jon Batiste", "to": "Jazz"}, {"from": "Jon Batiste", "to": "Saturday"}, {"from": "Jon Batiste", "to": "What"}, {"from": "Jon Batiste", "to": "Centeroo"}, {"from": "Josiah \u0026 the Bonnevilles", "to": "Folk"}, {"from": "Josiah \u0026 the Bonnevilles", "to": "Saturday"}, {"from": "Josiah \u0026 the Bonnevilles", "to": "This"}, {"from": "Josiah \u0026 the Bonnevilles", "to": "Centeroo"}, {"from": "Kasablanca", "to": "Alt Elect."}, {"from": "Kasablanca", "to": "Electronic"}, {"from": "Kasablanca", "to": "Saturday"}, {"from": "Kasablanca", "to": "Other"}, {"from": "Kasablanca", "to": "Centeroo"}, {"from": "Kat Hasty", "to": "Country"}, {"from": "Kat Hasty", "to": "Folk"}, {"from": "Kat Hasty", "to": "Thursday"}, {"from": "Kat Hasty", "to": "Galactic"}, {"from": "Kat Hasty", "to": "Outeroo"}, {"from": "Key Glock", "to": "Hip-Hop"}, {"from": "Key Glock", "to": "Trap"}, {"from": "Key Glock", "to": "Friday"}, {"from": "Key Glock", "to": "That"}, {"from": "Key Glock", "to": "Centeroo"}, {"from": "Khruangbin", "to": "Psych"}, {"from": "Khruangbin", "to": "Rock"}, {"from": "Khruangbin", "to": "Funk"}, {"from": "Khruangbin", "to": "Pop"}, {"from": "Khruangbin", "to": "Friday"}, {"from": "Khruangbin", "to": "What"}, {"from": "Khruangbin", "to": "Centeroo"}, {"from": "Kill Safari", "to": "Dubstep"}, {"from": "Kill Safari", "to": "Electronic"}, {"from": "Kill Safari", "to": "Saturday"}, {"from": "Kill Safari", "to": "With"}, {"from": "Kill Safari", "to": "Outeroo"}, {"from": "Knock2", "to": "House"}, {"from": "Knock2", "to": "Dubstep"}, {"from": "Knock2", "to": "Electronic"}, {"from": "Knock2", "to": "Saturday"}, {"from": "Knock2", "to": "Other"}, {"from": "Knock2", "to": "Centeroo"}, {"from": "Kyle Watson", "to": "Techno"}, {"from": "Kyle Watson", "to": "Electronic"}, {"from": "Kyle Watson", "to": "House"}, {"from": "Kyle Watson", "to": "Friday"}, {"from": "Kyle Watson", "to": "With"}, {"from": "Kyle Watson", "to": "Outeroo"}, {"from": "Larkin Poe", "to": "Blues"}, {"from": "Larkin Poe", "to": "Rock"}, {"from": "Larkin Poe", "to": "Pop"}, {"from": "Larkin Poe", "to": "Friday"}, {"from": "Larkin Poe", "to": "What"}, {"from": "Larkin Poe", "to": "Centeroo"}, {"from": "Last Heroes", "to": "Melodic Dubstep"}, {"from": "Last Heroes", "to": "Electronic"}, {"from": "Last Heroes", "to": "Saturday"}, {"from": "Last Heroes", "to": "With"}, {"from": "Last Heroes", "to": "Outeroo"}, {"from": "Libianca", "to": "Afrobeat"}, {"from": "Libianca", "to": "Sunday"}, {"from": "Libianca", "to": "Which"}, {"from": "Libianca", "to": "Centeroo"}, {"from": "Lily Fitts", "to": "Country"}, {"from": "Lily Fitts", "to": "Indie"}, {"from": "Lily Fitts", "to": "Folk"}, {"from": "Lily Fitts", "to": "UNK"}, {"from": "Lizzy McAlpine", "to": "Indie"}, {"from": "Lizzy McAlpine", "to": "Folk"}, {"from": "Lizzy McAlpine", "to": "Pop"}, {"from": "Lizzy McAlpine", "to": "Friday"}, {"from": "Lizzy McAlpine", "to": "Which"}, {"from": "Lizzy McAlpine", "to": "Centeroo"}, {"from": "Lovra", "to": "House"}, {"from": "Lovra", "to": "Electronic"}, {"from": "Lovra", "to": "Saturday"}, {"from": "Lovra", "to": "Other"}, {"from": "Lovra", "to": "Centeroo"}, {"from": "Lowdown Brass Band", "to": "Hip-Hop"}, {"from": "Lowdown Brass Band", "to": "Soul and R\u0026B"}, {"from": "Lowdown Brass Band", "to": "UNK"}, {"from": "Lyny", "to": "Dubstep"}, {"from": "Lyny", "to": "Electronic"}, {"from": "Lyny", "to": "Friday"}, {"from": "Lyny", "to": "Other"}, {"from": "Lyny", "to": "Centeroo"}, {"from": "Machinedrum", "to": "Electronic"}, {"from": "Machinedrum", "to": "Drum \u0026 Bass"}, {"from": "Machinedrum", "to": "Wednesday"}, {"from": "Machinedrum", "to": "With"}, {"from": "Machinedrum", "to": "Outeroo"}, {"from": "Maggie Antone", "to": "Country"}, {"from": "Maggie Antone", "to": "Folk"}, {"from": "Maggie Antone", "to": "Thursday"}, {"from": "Maggie Antone", "to": "Galactic"}, {"from": "Maggie Antone", "to": "Outeroo"}, {"from": "Maggie Rogers", "to": "Pop"}, {"from": "Maggie Rogers", "to": "Indie"}, {"from": "Maggie Rogers", "to": "Friday"}, {"from": "Maggie Rogers", "to": "Which"}, {"from": "Maggie Rogers", "to": "Centeroo"}, {"from": "Manwolves", "to": "Progressive"}, {"from": "Manwolves", "to": "Rock"}, {"from": "Manwolves", "to": "UNK"}, {"from": "Matt Maltese", "to": "Indie"}, {"from": "Matt Maltese", "to": "Folk"}, {"from": "Matt Maltese", "to": "Pop"}, {"from": "Matt Maltese", "to": "Thursday"}, {"from": "Matt Maltese", "to": "This"}, {"from": "Matt Maltese", "to": "Centeroo"}, {"from": "Matt Schuster", "to": "Country"}, {"from": "Matt Schuster", "to": "Saturday"}, {"from": "Matt Schuster", "to": "Galactic"}, {"from": "Matt Schuster", "to": "Outeroo"}, {"from": "Mdou Moctar", "to": "Psych"}, {"from": "Mdou Moctar", "to": "Rock"}, {"from": "Mdou Moctar", "to": "Pop"}, {"from": "Mdou Moctar", "to": "Friday"}, {"from": "Mdou Moctar", "to": "That"}, {"from": "Mdou Moctar", "to": "Centeroo"}, {"from": "Medium Build", "to": "Country"}, {"from": "Medium Build", "to": "Indie"}, {"from": "Medium Build", "to": "Folk"}, {"from": "Medium Build", "to": "Thursday"}, {"from": "Medium Build", "to": "That"}, {"from": "Medium Build", "to": "Centeroo"}, {"from": "Megan Thee Stallion", "to": "Hip-Hop"}, {"from": "Megan Thee Stallion", "to": "Pop"}, {"from": "Megan Thee Stallion", "to": "Sunday"}, {"from": "Megan Thee Stallion", "to": "What"}, {"from": "Megan Thee Stallion", "to": "Centeroo"}, {"from": "Melanie Martinez", "to": "Art Pop"}, {"from": "Melanie Martinez", "to": "Pop"}, {"from": "Melanie Martinez", "to": "Sunday"}, {"from": "Melanie Martinez", "to": "Which"}, {"from": "Melanie Martinez", "to": "Centeroo"}, {"from": "Michigander", "to": "Alt Rock"}, {"from": "Michigander", "to": "Indie"}, {"from": "Michigander", "to": "Rock"}, {"from": "Michigander", "to": "Thursday"}, {"from": "Michigander", "to": "That"}, {"from": "Michigander", "to": "Centeroo"}, {"from": "Mike", "to": "Hip-Hop"}, {"from": "Mike", "to": "Friday"}, {"from": "Mike", "to": "That"}, {"from": "Mike", "to": "Centeroo"}, {"from": "Mike.", "to": "Hip-Hop"}, {"from": "Mike.", "to": "Pop"}, {"from": "Mike.", "to": "Friday"}, {"from": "Mike.", "to": "This"}, {"from": "Mike.", "to": "Centeroo"}, {"from": "Militarie Gun", "to": "Punk"}, {"from": "Militarie Gun", "to": "Rock"}, {"from": "Militarie Gun", "to": "Alt Rock"}, {"from": "Militarie Gun", "to": "Thursday"}, {"from": "Militarie Gun", "to": "This"}, {"from": "Militarie Gun", "to": "Centeroo"}, {"from": "Milky Chance", "to": "Indie"}, {"from": "Milky Chance", "to": "Rock"}, {"from": "Milky Chance", "to": "Pop"}, {"from": "Milky Chance", "to": "Sunday"}, {"from": "Milky Chance", "to": "What"}, {"from": "Milky Chance", "to": "Centeroo"}, {"from": "Molly Grace", "to": "Funk"}, {"from": "Molly Grace", "to": "Pop"}, {"from": "Molly Grace", "to": "UNK"}, {"from": "Mon Rovia", "to": "Indie"}, {"from": "Mon Rovia", "to": "Folk"}, {"from": "Mon Rovia", "to": "Friday"}, {"from": "Mon Rovia", "to": "Galactic"}, {"from": "Mon Rovia", "to": "Outeroo"}, {"from": "Mono Means One", "to": "Alt Rock"}, {"from": "Mono Means One", "to": "Rock"}, {"from": "Mono Means One", "to": "Wednesday"}, {"from": "Mono Means One", "to": "Groop"}, {"from": "Mono Means One", "to": "Outeroo"}, {"from": "Muckers", "to": "Indie"}, {"from": "Muckers", "to": "Rock"}, {"from": "Muckers", "to": "Wednesday"}, {"from": "Muckers", "to": "Groop"}, {"from": "Muckers", "to": "Outeroo"}, {"from": "Nala", "to": "House"}, {"from": "Nala", "to": "Electronic"}, {"from": "Nala", "to": "Sunday"}, {"from": "Nala", "to": "With"}, {"from": "Nala", "to": "Outeroo"}, {"from": "Nation of Language", "to": "Indie"}, {"from": "Nation of Language", "to": "Rock"}, {"from": "Nation of Language", "to": "Pop"}, {"from": "Nation of Language", "to": "Thursday"}, {"from": "Nation of Language", "to": "This"}, {"from": "Nation of Language", "to": "Centeroo"}, {"from": "Neal Francis", "to": "Psych"}, {"from": "Neal Francis", "to": "Rock"}, {"from": "Neal Francis", "to": "Funk"}, {"from": "Neal Francis", "to": "Pop"}, {"from": "Neal Francis", "to": "Friday"}, {"from": "Neal Francis", "to": "That"}, {"from": "Neal Francis", "to": "Centeroo"}, {"from": "Neil Frances", "to": "Rock"}, {"from": "Neil Frances", "to": "Funk"}, {"from": "Neil Frances", "to": "Pop"}, {"from": "Neil Frances", "to": "Indie"}, {"from": "Neil Frances", "to": "Saturday"}, {"from": "Neil Frances", "to": "Other"}, {"from": "Neil Frances", "to": "Centeroo"}, {"from": "Nobody\u0027s Dancing", "to": "Electronic"}, {"from": "Nobody\u0027s Dancing", "to": "Indie"}, {"from": "Nobody\u0027s Dancing", "to": "Pop"}, {"from": "Nobody\u0027s Dancing", "to": "Wednesday"}, {"from": "Nobody\u0027s Dancing", "to": "Groop"}, {"from": "Nobody\u0027s Dancing", "to": "Outeroo"}, {"from": "Ocie Elliott", "to": "Folk"}, {"from": "Ocie Elliott", "to": "Thursday"}, {"from": "Ocie Elliott", "to": "This"}, {"from": "Ocie Elliott", "to": "Centeroo"}, {"from": "Oliver Heldons", "to": "House"}, {"from": "Oliver Heldons", "to": "Electronic"}, {"from": "Oliver Heldons", "to": "Thursday"}, {"from": "Oliver Heldons", "to": "Other"}, {"from": "Oliver Heldons", "to": "Outeroo"}, {"from": "Parcels", "to": "Rock"}, {"from": "Parcels", "to": "Funk"}, {"from": "Parcels", "to": "Pop"}, {"from": "Parcels", "to": "Sunday"}, {"from": "Parcels", "to": "This"}, {"from": "Parcels", "to": "Centeroo"}, {"from": "Paul McDonald", "to": "Indie"}, {"from": "Paul McDonald", "to": "Folk"}, {"from": "Paul McDonald", "to": "UNK"}, {"from": "Pocket", "to": "Electronic"}, {"from": "Pocket", "to": "House"}, {"from": "Pocket", "to": "Wednesday"}, {"from": "Pocket", "to": "With"}, {"from": "Pocket", "to": "Outeroo"}, {"from": "Post Malone", "to": "Hip-Hop"}, {"from": "Post Malone", "to": "Pop"}, {"from": "Post Malone", "to": "Friday"}, {"from": "Post Malone", "to": "What"}, {"from": "Post Malone", "to": "Centeroo"}, {"from": "Pretty Lights", "to": "Electronic"}, {"from": "Pretty Lights", "to": "Jam"}, {"from": "Pretty Lights", "to": "Thursday"}, {"from": "Pretty Lights", "to": "What"}, {"from": "Pretty Lights", "to": "Centeroo"}, {"from": "Rae and the Ragdolls", "to": "Rock"}, {"from": "Rae and the Ragdolls", "to": "Blues"}, {"from": "Rae and the Ragdolls", "to": "Wednesday"}, {"from": "Rae and the Ragdolls", "to": "Groop"}, {"from": "Rae and the Ragdolls", "to": "Outeroo"}, {"from": "Ranger Trucco", "to": "House"}, {"from": "Ranger Trucco", "to": "Electronic"}, {"from": "Ranger Trucco", "to": "Tuesday"}, {"from": "Ranger Trucco", "to": "With"}, {"from": "Ranger Trucco", "to": "Outeroo"}, {"from": "Red Hot Chili Peppers", "to": "Rock"}, {"from": "Red Hot Chili Peppers", "to": "Funk"}, {"from": "Red Hot Chili Peppers", "to": "Pop"}, {"from": "Red Hot Chili Peppers", "to": "Saturday"}, {"from": "Red Hot Chili Peppers", "to": "What"}, {"from": "Red Hot Chili Peppers", "to": "Centeroo"}, {"from": "Ren\u00e9e Rapp", "to": "Pop"}, {"from": "Ren\u00e9e Rapp", "to": "Saturday"}, {"from": "Ren\u00e9e Rapp", "to": "Which"}, {"from": "Ren\u00e9e Rapp", "to": "Centeroo"}, {"from": "R\u00f3is\u00edn Murphy", "to": "Art Pop"}, {"from": "R\u00f3is\u00edn Murphy", "to": "Pop"}, {"from": "R\u00f3is\u00edn Murphy", "to": "Friday"}, {"from": "R\u00f3is\u00edn Murphy", "to": "That"}, {"from": "R\u00f3is\u00edn Murphy", "to": "Centeroo"}, {"from": "Ryan Beatty", "to": "Soul and R\u0026B"}, {"from": "Ryan Beatty", "to": "Pop"}, {"from": "Ryan Beatty", "to": "Saturday"}, {"from": "Ryan Beatty", "to": "Which"}, {"from": "Ryan Beatty", "to": "Centeroo"}, {"from": "S.G. Goodman", "to": "Indie"}, {"from": "S.G. Goodman", "to": "Folk"}, {"from": "S.G. Goodman", "to": "Sunday"}, {"from": "S.G. Goodman", "to": "This"}, {"from": "S.G. Goodman", "to": "Centeroo"}, {"from": "Saffron Stone", "to": "House"}, {"from": "Saffron Stone", "to": "Electronic"}, {"from": "Saffron Stone", "to": "Thursday"}, {"from": "Saffron Stone", "to": "With"}, {"from": "Saffron Stone", "to": "Outeroo"}, {"from": "Sawyer Hill", "to": "Indie"}, {"from": "Sawyer Hill", "to": "Rock"}, {"from": "Sawyer Hill", "to": "UNK"}, {"from": "Say She She", "to": "Soul and R\u0026B"}, {"from": "Say She She", "to": "Jazz"}, {"from": "Say She She", "to": "Thursday"}, {"from": "Say She She", "to": "That"}, {"from": "Say She She", "to": "Centeroo"}, {"from": "Sean Paul", "to": "Reggae"}, {"from": "Sean Paul", "to": "Saturday"}, {"from": "Sean Paul", "to": "This"}, {"from": "Sean Paul", "to": "Centeroo"}, {"from": "Secret Headliner", "to": "UNK"}, {"from": "Secret Headliner", "to": "Wednesday"}, {"from": "Secret Headliner", "to": "Groop"}, {"from": "Secret Headliner", "to": "Outeroo"}, {"from": "Seven Lions", "to": "Melodic Dubstep"}, {"from": "Seven Lions", "to": "Electronic"}, {"from": "Seven Lions", "to": "Saturday"}, {"from": "Seven Lions", "to": "Other"}, {"from": "Seven Lions", "to": "Centeroo"}, {"from": "Shy Fx", "to": "Electronic"}, {"from": "Shy Fx", "to": "Drum \u0026 Bass"}, {"from": "Shy Fx", "to": "Friday"}, {"from": "Shy Fx", "to": "Other"}, {"from": "Shy Fx", "to": "Centeroo"}, {"from": "Sicaria", "to": "Dubstep"}, {"from": "Sicaria", "to": "Electronic"}, {"from": "Sicaria", "to": "Wednesday"}, {"from": "Sicaria", "to": "With"}, {"from": "Sicaria", "to": "Outeroo"}, {"from": "Sid Sriram", "to": "Soul and R\u0026B"}, {"from": "Sid Sriram", "to": "Thursday"}, {"from": "Sid Sriram", "to": "That"}, {"from": "Sid Sriram", "to": "Centeroo"}, {"from": "Star Seed", "to": "Melodic Dubstep"}, {"from": "Star Seed", "to": "Electronic"}, {"from": "Star Seed", "to": "Saturday"}, {"from": "Star Seed", "to": "With"}, {"from": "Star Seed", "to": "Outeroo"}, {"from": "Stoley", "to": "House"}, {"from": "Stoley", "to": "Electronic"}, {"from": "Stoley", "to": "Thursday"}, {"from": "Stoley", "to": "With"}, {"from": "Stoley", "to": "Outeroo"}, {"from": "Svdden Death", "to": "Dubstep"}, {"from": "Svdden Death", "to": "Electronic"}, {"from": "Svdden Death", "to": "Saturday"}, {"from": "Svdden Death", "to": "Other"}, {"from": "Svdden Death", "to": "Centeroo"}, {"from": "Taking Back Sunday", "to": "Punk"}, {"from": "Taking Back Sunday", "to": "Rock"}, {"from": "Taking Back Sunday", "to": "Pop"}, {"from": "Taking Back Sunday", "to": "Sunday"}, {"from": "Taking Back Sunday", "to": "This"}, {"from": "Taking Back Sunday", "to": "Centeroo"}, {"from": "Tanner Usrey", "to": "Country"}, {"from": "Tanner Usrey", "to": "Saturday"}, {"from": "Tanner Usrey", "to": "That"}, {"from": "Tanner Usrey", "to": "Centeroo"}, {"from": "Taylor Hunnicutt", "to": "Country"}, {"from": "Taylor Hunnicutt", "to": "Friday"}, {"from": "Taylor Hunnicutt", "to": "Galactic"}, {"from": "Taylor Hunnicutt", "to": "Outeroo"}, {"from": "Teezo Touchdown", "to": "Soul and R\u0026B"}, {"from": "Teezo Touchdown", "to": "Pop"}, {"from": "Teezo Touchdown", "to": "Hip-Hop"}, {"from": "Teezo Touchdown", "to": "Saturday"}, {"from": "Teezo Touchdown", "to": "That"}, {"from": "Teezo Touchdown", "to": "Centeroo"}, {"from": "Texas Hill", "to": "Country"}, {"from": "Texas Hill", "to": "Folk"}, {"from": "Texas Hill", "to": "UNK"}, {"from": "The Beaches", "to": "Indie"}, {"from": "The Beaches", "to": "Rock"}, {"from": "The Beaches", "to": "Sunday"}, {"from": "The Beaches", "to": "This"}, {"from": "The Beaches", "to": "Centeroo"}, {"from": "The Driver Era", "to": "Indie"}, {"from": "The Driver Era", "to": "Rock"}, {"from": "The Driver Era", "to": "Pop"}, {"from": "The Driver Era", "to": "Friday"}, {"from": "The Driver Era", "to": "What"}, {"from": "The Driver Era", "to": "Centeroo"}, {"from": "The Foxes", "to": "Pop"}, {"from": "The Foxes", "to": "Alt Rock"}, {"from": "The Foxes", "to": "Rock"}, {"from": "The Foxes", "to": "UNK"}, {"from": "The Garden", "to": "Punk"}, {"from": "The Garden", "to": "Alt Rock"}, {"from": "The Garden", "to": "Rock"}, {"from": "The Garden", "to": "Saturday"}, {"from": "The Garden", "to": "That"}, {"from": "The Garden", "to": "Centeroo"}, {"from": "The Heavy Heavy", "to": "Indie"}, {"from": "The Heavy Heavy", "to": "Rock"}, {"from": "The Heavy Heavy", "to": "Folk"}, {"from": "The Heavy Heavy", "to": "Thursday"}, {"from": "The Heavy Heavy", "to": "That"}, {"from": "The Heavy Heavy", "to": "Centeroo"}, {"from": "The Japanese-House", "to": "Indie"}, {"from": "The Japanese-House", "to": "Folk"}, {"from": "The Japanese-House", "to": "Pop"}, {"from": "The Japanese-House", "to": "Friday"}, {"from": "The Japanese-House", "to": "Which"}, {"from": "The Japanese-House", "to": "Centeroo"}, {"from": "The Maine", "to": "Pop"}, {"from": "The Maine", "to": "Alt Rock"}, {"from": "The Maine", "to": "Punk"}, {"from": "The Maine", "to": "Rock"}, {"from": "The Maine", "to": "Saturday"}, {"from": "The Maine", "to": "What"}, {"from": "The Maine", "to": "Centeroo"}, {"from": "The Mars Volta", "to": "Progressive"}, {"from": "The Mars Volta", "to": "Rock"}, {"from": "The Mars Volta", "to": "Psych"}, {"from": "The Mars Volta", "to": "Saturday"}, {"from": "The Mars Volta", "to": "This"}, {"from": "The Mars Volta", "to": "Centeroo"}, {"from": "The Teskey Brothers", "to": "Blues"}, {"from": "The Teskey Brothers", "to": "Rock"}, {"from": "The Teskey Brothers", "to": "Pop"}, {"from": "The Teskey Brothers", "to": "Saturday"}, {"from": "The Teskey Brothers", "to": "What"}, {"from": "The Teskey Brothers", "to": "Centeroo"}, {"from": "Thundercat", "to": "Soul and R\u0026B"}, {"from": "Thundercat", "to": "Funk"}, {"from": "Thundercat", "to": "Jazz"}, {"from": "Thundercat", "to": "Pop"}, {"from": "Thundercat", "to": "Saturday"}, {"from": "Thundercat", "to": "That"}, {"from": "Thundercat", "to": "Centeroo"}, {"from": "Tors", "to": "Folk"}, {"from": "Tors", "to": "Pop"}, {"from": "Tors", "to": "UNK"}, {"from": "T-Pain", "to": "Soul and R\u0026B"}, {"from": "T-Pain", "to": "Pop"}, {"from": "T-Pain", "to": "Hip-Hop"}, {"from": "T-Pain", "to": "Saturday"}, {"from": "T-Pain", "to": "Which"}, {"from": "T-Pain", "to": "Centeroo"}, {"from": "Trousdale", "to": "Folk"}, {"from": "Trousdale", "to": "Pop"}, {"from": "Trousdale", "to": "Saturday"}, {"from": "Trousdale", "to": "This"}, {"from": "Trousdale", "to": "Centeroo"}, {"from": "Tsha", "to": "Alt Elect."}, {"from": "Tsha", "to": "Electronic"}, {"from": "Tsha", "to": "Sunday"}, {"from": "Tsha", "to": "Other"}, {"from": "Tsha", "to": "Centeroo"}, {"from": "TV Girl", "to": "Indie"}, {"from": "TV Girl", "to": "Rock"}, {"from": "TV Girl", "to": "Pop"}, {"from": "TV Girl", "to": "Friday"}, {"from": "TV Girl", "to": "This"}, {"from": "TV Girl", "to": "Centeroo"}, {"from": "Two Friends", "to": "Pop"}, {"from": "Two Friends", "to": "Electronic"}, {"from": "Two Friends", "to": "Sunday"}, {"from": "Two Friends", "to": "Other"}, {"from": "Two Friends", "to": "Centeroo"}, {"from": "Tyler Halverson", "to": "Country"}, {"from": "Tyler Halverson", "to": "Folk"}, {"from": "Tyler Halverson", "to": "Sunday"}, {"from": "Tyler Halverson", "to": "Galactic"}, {"from": "Tyler Halverson", "to": "Outeroo"}, {"from": "Vandelux", "to": "House"}, {"from": "Vandelux", "to": "Electronic"}, {"from": "Vandelux", "to": "Saturday"}, {"from": "Vandelux", "to": "Other"}, {"from": "Vandelux", "to": "Centeroo"}, {"from": "Veggi", "to": "Trap"}, {"from": "Veggi", "to": "Electronic"}, {"from": "Veggi", "to": "Sunday"}, {"from": "Veggi", "to": "Other"}, {"from": "Veggi", "to": "Centeroo"}, {"from": "Vincent Lima", "to": "Indie"}, {"from": "Vincent Lima", "to": "Folk"}, {"from": "Vincent Lima", "to": "UNK"}, {"from": "VNSSA", "to": "House"}, {"from": "VNSSA", "to": "Electronic"}, {"from": "VNSSA", "to": "Sunday"}, {"from": "VNSSA", "to": "With"}, {"from": "VNSSA", "to": "Outeroo"}, {"from": "Whyte Fang", "to": "Alt Elect."}, {"from": "Whyte Fang", "to": "Electronic"}, {"from": "Whyte Fang", "to": "Saturday"}, {"from": "Whyte Fang", "to": "Other"}, {"from": "Whyte Fang", "to": "Centeroo"}, {"from": "Will Jones", "to": "Country"}, {"from": "Will Jones", "to": "Folk"}, {"from": "Will Jones", "to": "Thursday"}, {"from": "Will Jones", "to": "Galactic"}, {"from": "Will Jones", "to": "Outeroo"}, {"from": "Winyah", "to": "Country"}, {"from": "Winyah", "to": "UNK"}, {"from": "Wolves of Glendale", "to": "Comedy"}, {"from": "Wolves of Glendale", "to": "UNK"}, {"from": "Yer Flowers", "to": "Country"}, {"from": "Yer Flowers", "to": "Folk"}, {"from": "Yer Flowers", "to": "Saturday"}, {"from": "Yer Flowers", "to": "Galactic"}, {"from": "Yer Flowers", "to": "Outeroo"}, {"from": "Yetep", "to": "Melodic Dubstep"}, {"from": "Yetep", "to": "Electronic"}, {"from": "Yetep", "to": "Saturday"}, {"from": "Yetep", "to": "With"}, {"from": "Yetep", "to": "Outeroo"}, {"from": "Yves Tumor", "to": "Alt Rock"}, {"from": "Yves Tumor", "to": "Rock"}, {"from": "Yves Tumor", "to": "Sunday"}, {"from": "Yves Tumor", "to": "This"}, {"from": "Yves Tumor", "to": "Centeroo"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"nodes": {"borderWidth": 2, "size": 30, "color": {"border": "#222222", "background": "#666666"}, "font": {"color": "#eeeeee"}}, "edges": {"color": "lightgray"}, "physics": {"enabled": true, "stabilization": {"enabled": true, "iterations": 200, "updateInterval": 25}, "barnesHut": {"gravitationalConstant": -20000, "centralGravity": 0.3, "springLength": 95, "springConstant": 0.04, "damping": 0.09}}, "interaction": {"navigationButtons": true, "keyboard": true}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+                    network.on("selectNode", neighbourhoodHighlight);
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

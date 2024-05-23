@@ -1,3 +1,5 @@
 streamlit
 pyvis
 networkx
+pandas
+datapane
