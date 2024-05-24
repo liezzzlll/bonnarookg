@@ -10,8 +10,10 @@ from IPython.core.display import display, HTML
 # Read the new CSV file
 descriptors_data = pd.read_csv("Bonnaroo_KG.csv")
 
-# Split genres into separate rows
-descriptors_data = descriptors_data.assign(Genre=descriptors_data['Genre'].str.split(',')).explode('Genre').reset_index(drop=True)
+# Normalize and explode the genres into separate rows, ensuring to strip spaces and handle case insensitivity
+descriptors_data['Genre'] = descriptors_data['Genre'].str.lower().str.split(',')
+descriptors_data = descriptors_data.explode('Genre').reset_index(drop=True)
+descriptors_data['Genre'] = descriptors_data['Genre'].str.strip()
 
 # Define a color mapping for each column header
 color_map = {
@@ -32,16 +34,21 @@ st.markdown("""
 Hi Bonnarooians!  I used the data from the [genre venn diagram](https://www.reddit.com/r/bonnaroo/comments/1cllv19/2024_roo_genre_venn_diagram_is_here/?share_id=bMZmCCc3Oa8fHzdBxTHYd&utm_content=1&utm_medium=ios_app&utm_name=ioscss&utm_source=share&utm_term=1) that someone had made to make this interactive knowledge graph, combined with info about the day(s) the artist is playing and stage location.
             
 Note that I didn't add all of the Outeroo activities (i.e. yoga, tarot reading, etc. that didn't quite fit a "genre")
-            
+
+'UNK' means I didn't see any info about this artist, so lmk if you have any deets regarding any unknowns by [responding to the reddit thread](https://www.reddit.com/r/bonnaroo/comments/1cyu135/bonnaroo_2024_knowledge_graph/)!
+
 ## Play Around With the Nodes!
 
 - **Nodes**: Represent the entities in the graph, such as "Artist," "Genre," "Set Day," "Roo Location," and "Stage Name." Each node can have various properties like size, color, label, etc.
 - **Edges**: Represent the relationships or connections between the nodes, such as an artist being associated with a particular genre or the day they are playing, etc!
-- Move the map around by dragging it!
+- Move the map around by dragging it, using the arrows at the corner of the graph, or your keyboard!
             
 Wheeee!!! 
             
 For more information on using the filter feature, see [explanation below](#how-to-explore-the-bonnaroo-music-festival-graph).
+
+For the daily schedule, [see below](#bonnaroo-daily-schedule)! Remember, you can search for an artist, genre, set day, Roo location, and stage name in the knowledge graph above! For Thursday to Sunday, I've linked my friend's Spotify playlists that she curated per day!
+
 """)
 
 # Add a map key for colors and shapes
@@ -66,48 +73,52 @@ shape_map = {
     'Stage Name': 'square',
 }
 
-def create_knowledge_graph(data, columns): 
+def create_knowledge_graph(data, columns):
     # Calculate the frequency of each genre
     genre_frequency = Counter()
     for entry in data:
-        genres = entry[columns.get_loc('Genre')].split(', ')
-        genre_frequency.update(genres)
+        genres = entry[columns.get_loc('Genre')].split(',')
+        genre_frequency.update(genre.strip().lower() for genre in genres)
 
+    
     # Scale the size of nodes based on the number of artists in each genre
-    max_frequency = max(genre_frequency.values())
-    scaling_factor = 30  # Adjust the scaling factor as needed
-    min_size = 30        # Minimum size for genre nodes
-    artist_size = 15     # Fixed size for artist nodes
+    max_frequency = max(genre_frequency.values(), default=1)  # default=1 to handle empty data
+    scaling_factor = 30
+    min_size = 30
+    artist_size = 15
 
+    # Use sets to track added nodes
+    added_nodes = set()
+    
     # Add nodes and edges to the network
     for entry in data:
-        artist = str(entry[columns.get_loc('Artist')])  # Ensure ID is a string
-        net.add_node(artist, label=artist, title=artist, color=color_map['Artist'], size=artist_size, shape=shape_map['Artist'], font={'size': 20, 'vadjust': 25})
-
-        genres = entry[columns.get_loc('Genre')].split(', ')
+        artist = str(entry[columns.get_loc('Artist')]).strip()
+        if artist not in added_nodes:
+            net.add_node(artist, label=artist, title=artist, color=color_map['Artist'], size=artist_size, shape=shape_map['Artist'], font={'size': 20, 'vadjust': 25})
+            added_nodes.add(artist)
+        
+        genres = [genre.strip().lower() for genre in entry[columns.get_loc('Genre')].split(',')]
         for genre in genres:
-            frequency = genre_frequency[genre]
-            node_size = min_size + scaling_factor * (frequency / max_frequency)  # Ensure minimum size
-            genre = str(genre)  # Ensure ID is a string
-            net.add_node(genre, label=genre, title=genre, color=color_map['Genre'], size=node_size, shape=shape_map['Genre'])
-            net.add_edge(genre, artist)
+            node_size = min_size + scaling_factor * (genre_frequency[genre] / max_frequency)
+            if genre not in added_nodes:
+                net.add_node(genre, label=genre, title=genre, color=color_map['Genre'], size=node_size, shape=shape_map['Genre'])
+                added_nodes.add(genre)
+            net.add_edge(artist, genre)
 
-        set_days = [str(entry[columns.get_loc('Set Day')]), str(entry[columns.get_loc('2nd Set Day')]), str(entry[columns.get_loc('3rd Set Day')])]  # Ensure IDs are strings
-        roo_locations = [str(entry[columns.get_loc('Roo Location')]), str(entry[columns.get_loc('2nd Set Roo Location')]), str(entry[columns.get_loc('3rd Set Roo Location')])]  # Ensure IDs are strings
-        stage_names = [str(entry[columns.get_loc('Stage Name')]), str(entry[columns.get_loc('2nd Set Stage Name')]), str(entry[columns.get_loc('3rd Set Stage Name')])]  # Ensure IDs are strings
-
-        for set_day, roo_location, stage_name in zip(set_days, roo_locations, stage_names):
-            if set_day and set_day != "nan":
-                net.add_node(set_day, label=set_day, title=set_day, color=color_map['Set Day'], shape=shape_map['Set Day'], font={'size': 20, 'vadjust': 25})
-                net.add_edge(artist, set_day)
-            if roo_location and roo_location != "nan":
-                net.add_node(roo_location, label=roo_location, title=roo_location, color=color_map['Roo Location'], shape=shape_map['Roo Location'], font={'size': 20, 'vadjust': 25})
-                net.add_edge(artist, roo_location)
-            if stage_name and stage_name != "nan":
-                net.add_node(stage_name, label=stage_name, title=stage_name, color=color_map['Stage Name'], shape=shape_map['Stage Name'], font={'size': 20, 'vadjust': 25})
-                net.add_edge(artist, stage_name)
-                for genre in genres:
-                    net.add_edge(stage_name, genre)  # Add new relationship: Genre to Stage Name
+        # Loop to manage additional properties dynamically
+        property_types = [('Set Day', 'Set Day'), ('Roo Location', 'Roo Location'), ('Stage Name', 'Stage Name')]
+        for prop, col_key in property_types:
+            for suffix in ['', '2nd ', '3rd ']:
+                prop_name = f'{suffix}{prop}'
+                if prop_name in columns:
+                    item = str(entry[columns.get_loc(prop_name)]).strip()
+                    if item and item != 'nan':
+                        if item not in added_nodes:
+                            net.add_node(item, label=item, title=item, color=color_map[col_key], shape=shape_map[col_key], font={'size': 20, 'vadjust': 25})
+                            added_nodes.add(item)
+                        net.add_edge(artist, item)
+                        for genre in genres:
+                            net.add_edge(genre, item)  # Adding edges from genre to set day, location, and stage
 
     # Configure physics and interaction options
     net.set_options("""
@@ -182,8 +193,48 @@ st.markdown("""
 - **Reset Selection** by clicking "Reset Selection" to clear the current filter and return the graph to its default view, showing all nodes and edges.
 - **Pls ignore** the 'edge'>>'id'>> filtering function, it's showing the unique identifiers instead of labels, idk how to fix it >.< !!
 
+""")
+
+# Bonnaroo Daily Schedule
+st.title("Bonnaroo Daily Schedule")
+
+# Tuesday
+st.header("Tuesday")
+st.image("img/2024_outeroo_tue.png", caption="Outeroo Tuesday")
+
+# Wednesday
+st.header("Wednesday")
+st.image("img/2024_outeroo_wed.png", caption="Outeroo Wednesday")
+
+# Thursday
+st.header("Thursday")
+st.image("img/2024_centeroo_thu.png", caption="Centeroo Thursday")
+st.image("img/2024_outeroo_thu.png", caption="Outeroo Thursday")
+st.markdown("[Thursday Sets Spotify Playlist](https://open.spotify.com/playlist/6Z7TF98QOf4zHifNgWEGCe?si=X7O5gkvhRKmcAiBYSAXeLw&pi=u-KX-YB9ChSWyC)")
+
+# Friday
+st.header("Friday")
+st.image("img/2024_centeroo_fri.png", caption="Centeroo Friday")
+st.image("img/2024_outeroo_fri.png", caption="Outeroo Friday")
+st.markdown("[Friday Sets Spotify Playlist](https://open.spotify.com/playlist/1O1dR7G7l7mRY1tGqR5UbW?si=ZQ1WK2smSMKXGIMpOwqp8g&pi=u-5FiNTvwUTCy9)")
+
+# Saturday
+st.header("Saturday")
+st.image("img/2024_centeroo_sat.png", caption="Centeroo Saturday")
+st.image("img/2024_outeroo_sat.png", caption="Outeroo Saturday")
+st.markdown("[Saturday Sets Spotify Playlist](https://open.spotify.com/playlist/01HarVumXcUXWKylX6e45C?si=tx7HmPLWRC-vbEJsB9gRhg&pi=u-hIQ9CyPETgWs)")
+
+
+# Sunday
+st.header("Sunday")
+st.image("img/2024_centeroo_sun.png", caption="Centeroo Sunday")
+st.image("img/2024_outeroo_sun.png", caption="Outeroo Sunday")
+st.markdown("[Sunday Sets Spotify Playlist](https://open.spotify.com/playlist/1XsJCp8uR8c2x1LXmDKa0y?si=ECk2AElDSfeWHMIykz-jkA&pi=u-spArrRfwR5u1)")
+
+st.markdown("""
 ## Hope you enjoy this! - Liezl teehee <3 
 Wanna fork this code and make your own? Here's my [GitHub](https://github.com/liezzzlll). 
 
 [My personal site](https://liezzzlll.github.io/liezzzlll/) 
+
 """)
